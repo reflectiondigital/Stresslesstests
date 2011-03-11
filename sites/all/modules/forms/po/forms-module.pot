@@ -1,0 +1,93 @@
+# LANGUAGE translation of Drupal (forms.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: forms.module,v 1.14 2004/11/27 02:05:09 walkah
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2005-10-04 08:46+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: forms.module:7
+msgid "Allows the creation of custom forms (to be used by other modules)"
+msgstr ""
+
+#: forms.module:117
+msgid "Field '%name' saved successfully"
+msgstr ""
+
+#: forms.module:150
+msgid "Type"
+msgstr ""
+
+#: forms.module:151
+msgid "Title"
+msgstr ""
+
+#: forms.module:151
+msgid "The title will be shown in the user interface."
+msgstr ""
+
+#: forms.module:152
+msgid "Explanation"
+msgstr ""
+
+#: forms.module:152
+msgid "An optional explanation to go with the new field.  The explanation will be shown to the user."
+msgstr ""
+
+#: forms.module:153
+msgid "Selection options"
+msgstr ""
+
+#: forms.module:153
+msgid "For select fields only. A list of all options - delimited by semicolons (e.g. red;blue;green). To have different labels from values, use colons e.g. 1:red;2:blue;3:green"
+msgstr ""
+
+#: forms.module:154
+msgid "Allow multiple selection"
+msgstr ""
+
+#: forms.module:155
+msgid "Weight"
+msgstr ""
+
+#: forms.module:155
+msgid "The weights define the order in which the form fields are shown.  Lighter fields \"float up\" towards the top of the category."
+msgstr ""
+
+#: forms.module:156
+msgid "Required field"
+msgstr ""
+
+#: forms.module:157
+msgid "Validation function"
+msgstr ""
+
+#: forms.module:157
+msgid "Name of a function to test the input value"
+msgstr ""
+
+#: forms.module:205
+msgid "%field is required"
+msgstr ""
+
+#: forms.module:213
+msgid "Invalid entry for %field"
+msgstr ""
+
+#: forms.module:264
+msgid "--"
+msgstr ""
+
+#: forms.module:0
+msgid "forms"
+msgstr ""
+

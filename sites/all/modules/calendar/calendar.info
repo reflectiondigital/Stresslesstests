@@ -1,0 +1,12 @@
+; $Id: calendar.info,v 1.7 2008/01/27 12:33:19 karens Exp $
+name = Calendar
+description = Views plugin to display views containing dates as Calendars.
+package = Date/Time
+dependencies = views date_api date_timezone
+
+
+; Information added by drupal.org packaging script on 2009-05-06
+version = "5.x-2.7"
+project = "calendar"
+datestamp = "1241611516"
+

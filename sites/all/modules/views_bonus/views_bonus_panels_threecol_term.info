@@ -1,0 +1,10 @@
+name = Bonus: panels, by term, 3 columns
+description = "Sets up a view whose summary view is set up in 3 panels categorized by term. See README.txt for more information."
+dependencies = views panels
+package = Views
+
+; Information added by drupal.org packaging script on 2007-08-02
+version = "5.x-1.1"
+project = "views_bonus"
+datestamp = "1186077525"
+

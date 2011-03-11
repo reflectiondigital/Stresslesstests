@@ -1,0 +1,207 @@
+<?php
+// $Id: views_bonus_panels_threecol_term.module,v 1.2.2.4 2007/07/02 17:07:30 dmitrig01 Exp $
+function views_bonus_panels_threecol_term_views_style_plugins() {
+  $items['panels_threecol_term'] = array(
+    'name' => t('Panels: By Term, 3 columns'),
+    'theme' => 'views_view_teasers',
+    'summary_theme' => 'views_bonus_panels_byterm_summary',
+  );
+  return $items;
+}
+
+// inspired by the the 3 column classifieds in the middle section of http://sfbay.craigslist.org/
+function theme_views_bonus_panels_byterm_summary($view) {
+  drupal_add_css(drupal_get_path('module', 'views_bonus_panels_threecol_term') .'/views_bonus.css');
+  // argument 0 must be a vocabulary ID
+  $vid = $view->args[0];
+  $tree = taxonomy_get_tree($vid);
+  // group terms with their parent
+  foreach ($tree as $term) {
+    $cnt = taxonomy_term_count_nodes($term->tid);
+    if ($term->depth > 1) {
+      $prefix = _taxonomy_depth($term->depth-1). '&nbsp;';
+    }
+    $txt = array($prefix. l($term->name, "$view->real_url/$term->tid"). "&nbsp;($cnt)"); 
+    if ($term->depth == 0) {
+      $parent_tid = $term->tid;
+      $groups[$parent_tid]['header'] = $txt;
+    }
+    else {
+      $groups[$parent_tid]['rows'][] = $txt;
+    }
+  }
+  
+  // render the groups into tables spread across 3 columns
+  $content = array();
+  $i=0;
+  foreach ($groups as $group) {
+    switch ($i % 3) {
+      case 0:
+        $section = 'left';
+        break;
+      case 1:
+        $section = 'middle';
+        break;
+      case 2:
+        $section = 'right';
+        break;
+    }
+    $content[$section] .= theme('table', $group['header'], $group['rows']);
+    $i++;
+  }  
+  return panels_print_layout('threecol_33_34_33', $content);
+}
+
+function views_bonus_panels_threecol_term_views_default_views() {
+  // this view takes advantage of the summary_combo plugin
+  $view = new stdClass();
+  $view->name = 'taxonomy_directory';
+  $view->description = t('First letter of term on top and related view on bottom of each page.');
+  $view->access = array ();
+  $view->view_args_php = '';
+  $view->page = TRUE;
+  $view->page_title = t('directory');
+  $view->page_header = '';
+  $view->page_header_format = '3';
+  $view->page_footer = '';
+  $view->page_footer_format = '1';
+  $view->page_empty = '';
+  $view->page_empty_format = '1';
+  $view->page_type = 'summary_combo';
+  $view->url = 'directory';
+  $view->use_pager = TRUE;
+  $view->nodes_per_page = '50';
+  $view->menu = TRUE;
+  $view->menu_title = t('Directory');
+  $view->menu_tab = FALSE;
+  $view->menu_tab_default = FALSE;
+  $view->menu_weight = '';
+  $view->sort = array (
+  array (
+    'tablename' => 'term_data',
+    'field' => 'weight',
+    'sortorder' => 'ASC',
+    'options' => '',
+  ),
+  array (
+    'tablename' => 'node',
+    'field' => 'sticky',
+    'sortorder' => 'DESC',
+    'options' => '',
+  ),
+  array (
+    'tablename' => 'node',
+    'field' => 'created',
+    'sortorder' => 'DESC',
+    'options' => '',
+  ),
+  );
+  $view->argument = array (
+  array (
+    'type' => 'taxletter',
+    'argdefault' => '6',
+    'title' => '%1',
+    'options' => '1',
+    'wildcard' => '',
+    'wildcard_substitution' => '',
+  ),
+  array (
+    'type' => 'taxletter',
+    'argdefault' => '6',
+    'title' => '%2',
+    'options' => '',
+    'wildcard' => '',
+    'wildcard_substitution' => '',
+  ),
+  );
+  $view->field = array (
+  array (
+    'tablename' => 'node',
+    'field' => 'title',
+    'label' => '',
+    'handler' => 'views_handler_field_nodelink',
+    'sortable' => '1',
+  ),
+  );
+  $view->filter = array (
+  array (
+    'tablename' => 'node',
+    'field' => 'status',
+    'operator' => '=',
+    'options' => '',
+    'value' => '1',
+  ),
+  );
+  $view->exposed_filter = array ();
+  $view->requires = array(term_data, node);
+  $views[$view->name] = $view;
+
+  $view = new stdClass();
+  $view->name = 'panels_by_term';
+  $view->description = t('Bonus Pack: Standard taxonomy presentation except the summary view presents terms within narrow tables in a 3 col layout.');
+  $view->access = array ();
+  $view->view_args_php = '';
+  $view->page = TRUE;
+  $view->page_title = 'panels_by_term';
+  $view->page_header = '';
+  $view->page_header_format = '1';
+  $view->page_footer = '';
+  $view->page_footer_format = '1';
+  $view->page_empty = '';
+  $view->page_empty_format = '1';
+  $view->page_type = 'panels_threecol_term';
+  $view->url = 'panels_by_term';
+  $view->use_pager = TRUE;
+  $view->nodes_per_page = '10';
+  $view->sort = array (
+    array (
+      'tablename' => 'node',
+      'field' => 'sticky',
+      'sortorder' => 'DESC',
+      'options' => '',
+    ),
+    array (
+      'tablename' => 'node',
+      'field' => 'created',
+      'sortorder' => 'DESC',
+      'options' => '',
+    ),
+  );
+  $view->argument = array (
+    array (
+      'type' => 'vocid',
+      'argdefault' => '1',
+      'title' => '%1',
+      'options' => '',
+      'wildcard' => '',
+      'wildcard_substitution' => '',
+    ),
+    array (
+      'type' => 'taxid',
+      'argdefault' => '6',
+      'title' => '%1 - %2',
+      'options' => '9',
+      'wildcard' => '',
+      'wildcard_substitution' => '',
+    ),
+  );
+  $view->field = array (
+    array (
+      'tablename' => 'node',
+      'field' => 'title',
+      'label' => '',
+      'handler' => 'views_handler_field_nodelink',
+      'options' => 'link',
+    ),
+    );
+  $view->filter = array (
+  );
+  $view->exposed_filter = array (
+  );
+  $view->requires = array('node');
+
+  $views[$view->name] = $view;
+
+  return $views;
+}
+

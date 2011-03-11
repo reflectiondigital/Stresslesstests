@@ -1,0 +1,58 @@
+<?php
+// $Id: views_mail.install,v 1.1.2.1 2008/06/15 07:30:05 somebodysysop Exp $
+
+function views_mail_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+
+      db_query("CREATE TABLE {views_mail_optout} (
+        email varchar(60) NOT NULL default '',
+        nid int(10) unsigned NOT NULL DEFAULT '0',
+        PRIMARY KEY  (email, nid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+
+      break;
+
+    case 'pgsql':
+
+      db_query("CREATE TABLE {views_mail_optout} (
+        email varchar(60) NOT NULL default '',
+        nid int(10) unsigned NOT NULL DEFAULT '0',
+        PRIMARY KEY  (email, uid)
+      );");
+
+      break;
+  }
+
+  drupal_set_message(t('Views Mail module enabled. Please see the included README file for further installation instructions.'));
+
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function views_mail_uninstall() {
+
+  db_query('DROP TABLE {views_mail_optout}');
+
+  drupal_set_message(t('Views Mail module successfully uninstalled'));
+}
+
+
+/**
+ * Update 5110
+ * First database update for Drupal 5.x Views_Mail Release 1.1
+ * Create views_mail_optout
+ */
+function views_mail_update_5110() {
+  $items = array();
+  $items[] = update_sql("CREATE TABLE {views_mail_optout} (
+        email varchar(60) NOT NULL default '',
+        nid int(10) unsigned NOT NULL DEFAULT '0',
+        PRIMARY KEY  (email, nid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+  return $items;
+}
+
+?>

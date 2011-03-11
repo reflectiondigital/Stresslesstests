@@ -1,0 +1,4 @@
+; $Id$
+name = Contact Form
+description = Allow admins to send messages to customers
+version = "5.x"

@@ -1,0 +1,276 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Notify module\n"
+"POT-Creation-Date: 2006-07-26 20:31-0400\n"
+"PO-Revision-Date: 2007-10-21 19:22+0200\n"
+"Last-Translator:Sebastiaan Mindreau <SabbeRubbish@gmail.com>\n"
+"Language-Team: Dutch\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Dutch\n"
+
+#: notify.inc:26
+msgid "Master switch"
+msgstr "Hoofdschakelaar"
+
+#: notify.inc:27
+msgid "Do you wish to receive periodic e-mails when new content is posted?"
+msgstr "Wenst u op geregelde tijdstippen e-mails te ontvangen met nieuwe onderwerpen?"
+
+#: notify.inc:27
+msgid "Notify status"
+msgstr "Toestand van de notificatie"
+
+#: notify.inc:29
+msgid "Detailed settings"
+msgstr "Gedetailleerde instellingen"
+
+#: notify.inc:30
+msgid "Include new content in the notification mail."
+msgstr "Voeg de nieuwe inhoud toe aan de notificatie e-mail."
+
+#: notify.inc:30
+msgid "Notify new content"
+msgstr "Notificatie van nieuwe onderwerpen"
+
+#: notify.inc:31
+msgid "Content"
+msgstr "Onderwerpen"
+
+#: notify.inc:31
+msgid ""
+"Select the amount of each post that you would like to see in your "
+"notification e-mails."
+msgstr "Selecteer de hoeveelheid van elke post die u in notificatie e-mails wenst te zien."
+
+#: notify.inc:32
+msgid "Include new comments in the notification mail."
+msgstr "Voeg commentaren toe aan de notificatie e-mail."
+
+#: notify.inc:32
+msgid "Notify new comments"
+msgstr "Notificatie van nieuwe reacties"
+
+#: notify.inc:36
+msgid ""
+"Your e-mail address must be specified on your <a href=\"%url\">my account</"
+"a> page."
+msgstr "Uw e-mail adres moet op uw <a href=\"%url\">accountpagina</a> ingevuld zijn."
+
+#: notify.inc:70
+msgid "%count pending notification e-mails have been sent."
+msgstr "%count wachtende notificatie e-mails zijn verstuurd."
+
+#: notify.inc:73
+msgid "%count notification e-mails could not be sent."
+msgstr "%count wachtende notificatie e-mails konden niet verstuurd worden."
+
+#: notify.inc:76
+msgid "No notification e-mails needed to be sent."
+msgstr "Er moeten geen notificatie e-mails verstuurd worden."
+
+#: notify.inc:92
+msgid "The following table shows all users that have notifications enabled."
+msgstr "Volgende tabel toont alle gebruikers die op de hoogte gebracht willen worden via notificatie e-mails."
+
+#: notify.inc:110
+msgid "e-mail address"
+msgstr "e-mail adres"
+
+#: notify.inc:110
+msgid "failed attempts"
+msgstr "mislukte pogingen"
+
+#: notify.inc:110
+msgid "teasers"
+msgstr "verkorte weergaven"
+
+#: notify.inc:202
+msgid "%sitename new content notification for %username"
+msgstr "Nieuwe inhoud op %sitename voor %username"
+
+#: notify.inc:218
+msgid "Queued"
+msgstr "In wachtrij"
+
+#: notify.inc:224
+msgid "Unpublished"
+msgstr "Niet gepubliceerd"
+
+#: notify.inc:230
+msgid "%title"
+msgstr ""
+
+#: notify.inc:231
+msgid "%status %type by %author"
+msgstr "%type %status door %author : %title"
+
+#: notify.inc:239
+msgid "1 new node"
+msgid_plural "%count new nodes"
+msgstr[0] "1 nieuwe node"
+msgstr[1] "%count nieuwe nodes"
+
+#: notify.inc:239
+msgid "Recent content - %count"
+msgstr "Recente onderwerpen - %count"
+
+#: notify.inc:259
+msgid "%count new comments attached to %type posted by %author: %title"
+msgstr "%type nieuwe reacties voor %type door %author"
+
+#: notify.inc:269
+msgid "%title by %author"
+msgstr "%title door %author"
+
+#: notify.inc:277
+msgid "Recent comments - %count"
+msgstr "Recente reacties - %count"
+
+#: notify.inc:286
+msgid "Greetings %user,"
+msgstr "Hallo %user,"
+
+#: notify.inc:289
+msgid "This is an automatic e-mail from %sitename."
+msgstr "Dit is een automatische e-mail van %sitename."
+
+#: notify.inc:290
+msgid ""
+"To stop receiving these e-mails, change your notification preferences at %"
+"notify-url"
+msgstr "Om geen notificatie e-mails meer te ontvangen, verander uw notificatie instellingen op %notify-url"
+
+#: notify.inc:295
+msgid "Notify: User %name (%mail) could not be notified. Mail error."
+msgstr "Notificatie: Gebruiker %name (%mail) kon niet bereikt worden.  Mail fout."
+
+#: notify.inc:299
+msgid "Notify: User %name (%mail) notified successfully."
+msgstr "Notificatie: Gebruiker %name (%mail) werd succesvol op de hoogte gebracht."
+
+#: notify.inc:31;98
+msgid "Title + Body"
+msgstr "Titel + Inhoud"
+
+#: notify.inc:31;98
+msgid "Title + Teaser"
+msgstr "Titel + Verkorte versie"
+
+#: notify.inc:31;98
+msgid "Title only"
+msgstr "Enkel titel"
+
+#: notify.inc:55;84
+msgid "Notify settings saved."
+msgstr "Notificatie instellingen opgeslagen."
+
+#: notify.inc:64;103
+msgid "Save and send now"
+msgstr "Opslaan en nu verzenden"
+
+#: notify.inc:79;102
+msgid "Save"
+msgstr "Opslaan"
+
+#: notify.install:36
+msgid "Notify module installed successfully."
+msgstr "Notificatiemodule succesvol geïnstalleerd."
+
+#: notify.install:39
+msgid ""
+"Table installation for the Notify module was unsuccessful. The tables may "
+"need to be installed by hand."
+msgstr "Tabelinstallatie voor de Notificatie module was niet succesvol.  De tabellen moeten mogelijks handmatig geïnstalleerd worden."
+
+#: notify.module:0
+msgid "notify"
+msgstr "notificatie"
+
+#: notify.module:10
+msgid ""
+"The notification module allows users to subscribe to periodic e-mails which "
+"include all new or revised content and/or comments much like the daily news "
+"letters sent by some websites.  Even if this feature is not configured for "
+"normal site users, it can be a useful feature for an administrator of a site "
+"to monitor content submissions and comment posts."
+msgstr ""
+"De notificatie module laat gebruikers toe om zich in te schrijven op "
+"periodieke e-mails, die nieuwe of veranderde inhoud bevatten en/of reacties, "
+"gelijkend op de dagelijkse nieuwsbrieven die sommige websites versturen.  Zelfs "
+"als deze module niet geactiveerd is voor normale gebruikers, kan het toch nog "
+"een handige functie zijn voor website administrators, om zo nieuwe onderwerpen "
+"en reacties op te volgen."
+
+#: notify.module:11
+msgid ""
+"The administrator sets the frequency of the e-mails in the notify "
+"administration interface. They can also set how many e-mail failures should "
+"occur before notify stops sending notifications.  Note that cron must be "
+"enabled for notifications to be sent out."
+msgstr ""
+"De administrator stelt de frequentie in van de e-mails in de notificatie "
+"administratie interface. Hij/zij kan ook instellen hoeveel mislukte pogingen "
+"er mogen gebeuren voordat geen notificaties meer verstuurd worden. Merk op dat "
+"cron nodig is om notificaties te sturen."
+
+#: notify.module:12
+msgid ""
+"<p>You can</p><ul><li>set up your site to run tasks automatically at "
+"required intervals. For more information, see <a href=\"%admin-help-system"
+"\">cron</a>.</li><li>administer notify <a href=\"%admin-settings-notify"
+"\">administer &gt;&gt; settings &gt;&gt; notify</a>.</li></ul>"
+msgstr ""
+"<p>U kan </p><ul><li>uw website configureren om taken automatisch uit te voeren "
+"op bepaalde tijdstippen. Voor meer informatie, ga naar <a href=\"%admin-help-system"
+"\">cron</a>.</li><li>beheer notificaties <a href=\"%admin-settings-notify"
+"\">beheer &gt;&gt; instellingen &gt;&gt; notificaties</a>.</li></ul>"
+
+#: notify.module:13
+msgid ""
+"For more information please read the configuration and customization "
+"handbook <a href=\"%notify\">Notify page</a>."
+msgstr ""
+"Voor meer informatie leest u best de configuratie- en customisatiehandleiding "
+"op de <a href=\"%notify\">Notificatie pagina</a>."
+
+#: notify.module:16
+msgid "Enables notifications by e-mail."
+msgstr "Schakel notificaties per e-mail aan."
+
+#: notify.module:43
+msgid "E-mail notification settings"
+msgstr "E-mail notificatie instellingen"
+
+#: notify.module:49
+msgid "Send notifications every"
+msgstr "Stuur notificaties om de"
+
+#: notify.module:52
+msgid "Requires crontab."
+msgstr "Heeft crontab nodig."
+
+#: notify.module:57
+msgid "Number of failed sends after which notifications are disabled"
+msgstr "Aantal mislukte verzendingen waarna notificaties uitgeschakeld worden"
+
+#: notify.module:92
+msgid "access notify"
+msgstr "toegang tot notificaties"
+
+#: notify.module:92
+msgid "administer notify"
+msgstr "administreer notificaties"
+
+#: notify.module:104
+msgid "my notify settings"
+msgstr "mijn notificatie instellingen"
+
+#: notify.module:105
+msgid "notifications"
+msgstr "notificaties"
+
+#: notify.module:113
+msgid "notify settings"
+msgstr "notificatie opties"

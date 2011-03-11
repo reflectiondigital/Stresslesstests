@@ -1,0 +1,435 @@
+<?php
+// $Id: submenutree.module,v 1.2.2.4 2008/04/16 02:11:41 bengtan Exp $
+// Modeline for drupal
+// vim: set expandtab tabstop=2 shiftwidth=2 autoindent smartindent filetype=php:
+
+define('SUBMENUTREE_DISPLAY_MENU', 0);
+define('SUBMENUTREE_DISPLAY_TITLES', 1);
+define('SUBMENUTREE_DISPLAY_TEASERS', 2);
+define('SUBMENUTREE_DISPLAY_TEASERS_LINKS', 3);
+define('SUBMENUTREE_DISPLAY_FULLTEXT', 4);
+define('SUBMENUTREE_DISPLAY_FULLTEXT_LINKS', 5);
+
+define('SUBMENUTREE_DISPLAY_BLOCK_MASK', 15);
+define('SUBMENUTREE_DISPLAY_BLOCK_MENU', 16);
+define('SUBMENUTREE_DISPLAY_BLOCK_TITLES', 17);
+define('SUBMENUTREE_DISPLAY_BLOCK_TEASERS', 18);
+define('SUBMENUTREE_DISPLAY_BLOCK_TEASERS_LINKS', 19);
+define('SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT', 20);
+define('SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT_LINKS', 21);
+
+define('SUBMENUTREE_BLOCK_SUBMENU', 0);
+define('SUBMENUTREE_BLOCK_SIBLINGMENU', 1);
+
+
+/**
+ * Implementation of hook_help().
+ */
+function submenutree_help($section) {
+  switch ($section) {
+    case 'admin/help#submenutree':
+      return t("For nodes which are displayed as menu items, this module adds a listing of any submenu items below it into the content or into a block. It can also add a listing of sibling menu items.");
+  }
+}
+
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function submenutree_form_alter($form_id, &$form) { 
+  if (strpos($form_id, 'node_form') > 0) {
+    $node = $form['#node'];
+    // Inject some sane defaults
+    if (empty($node->submenutree_enable)) {
+      $node->submenutree_enable = 0;
+      $node->submenutree_display = SUBMENUTREE_DISPLAY_MENU;
+      $node->submenutree_weight = 1;
+    }
+    if (empty($node->siblingmenutree_enable)) {
+      $node->siblingmenutree_enable = 0;
+      $node->siblingmenutree_display = SUBMENUTREE_DISPLAY_MENU;
+      $node->siblingmenutree_weight = 1;
+    }
+
+    $form['menu']['submenutree'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Submenu Tree Settings'),
+      '#collapsible' => true,
+      '#collapsed' => !$node->submenutree_enable,
+
+      'submenutree_enable' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable submenu trees for this node'),
+        '#default_value' => $node->submenutree_enable,
+      ),
+
+      'submenutree_title' => array(
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#default_value' => $node->submenutree_title,
+        '#description' => t('The title of the submenu tree content or block. If you leave this blank, the submenu tree content will have no title, or the submenu tree block will use the node title.'),
+      ),
+
+      'submenutree_display' => array(
+        '#type' => 'select',
+        '#title' => t('Display submenu trees as'),
+        '#options' => array(
+          'content' => array(
+            SUBMENUTREE_DISPLAY_MENU => t('Menu'),
+            SUBMENUTREE_DISPLAY_TITLES => t('Titles only'),
+            SUBMENUTREE_DISPLAY_TEASERS => t('Teasers'),
+            SUBMENUTREE_DISPLAY_TEASERS_LINKS => t('Teasers with links'),
+            SUBMENUTREE_DISPLAY_FULLTEXT => t('Full text'),
+            SUBMENUTREE_DISPLAY_FULLTEXT_LINKS => t('Full text with links'),
+            ),
+          'block' => array(
+            SUBMENUTREE_DISPLAY_BLOCK_MENU => t('Menu'),
+            SUBMENUTREE_DISPLAY_BLOCK_TITLES => t('Titles only'),
+            SUBMENUTREE_DISPLAY_BLOCK_TEASERS => t('Teasers'),
+            SUBMENUTREE_DISPLAY_BLOCK_TEASERS_LINKS => t('Teasers with links'),
+            SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT => t('Full text'),
+            SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT_LINKS => t('Full text with links'),
+            ),
+        ),
+        '#default_value' => $node->submenutree_display,
+        '#description' => t('Select where and how the submenu tree should be displayed. If selecting a block display, the block also needs to be made visible.'),
+      ),
+
+      'submenutree_weight' => array(
+        '#type' => 'weight',
+        '#title' => t('Weight'),
+        '#default_value' => $node->submenutree_weight,
+        '#description' => t('The weight of the submenu tree listing. This only applies when displaying as content and affects where the submenu tree appears in the content.'),
+      ),
+    );
+
+    $form['menu']['siblingmenutree'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Siblingmenu Tree Settings'),
+      '#collapsible' => true,
+      '#collapsed' => !$node->siblingmenutree_enable,
+
+      'siblingmenutree_enable' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable siblingmenu trees for this node'),
+        '#default_value' => $node->siblingmenutree_enable,
+      ),
+
+      'siblingmenutree_title' => array(
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#default_value' => $node->siblingmenutree_title,
+        '#description' => t('The title of the siblingmenu tree content or block. If you leave this blank, the siblingmenu tree content will have no title, or the siblingmenu tree block will use the node title.'),
+      ),
+
+      'siblingmenutree_display' => array(
+        '#type' => 'select',
+        '#title' => t('Display siblingmenu trees as'),
+        '#options' => array(
+          'content' => array(
+            SUBMENUTREE_DISPLAY_MENU => t('Menu'),
+            SUBMENUTREE_DISPLAY_TITLES => t('Titles only'),
+            SUBMENUTREE_DISPLAY_TEASERS => t('Teasers'),
+            SUBMENUTREE_DISPLAY_TEASERS_LINKS => t('Teasers with links'),
+            SUBMENUTREE_DISPLAY_FULLTEXT => t('Full text'),
+            SUBMENUTREE_DISPLAY_FULLTEXT_LINKS => t('Full text with links'),
+            ),
+          'block' => array(
+            SUBMENUTREE_DISPLAY_BLOCK_MENU => t('Menu'),
+            SUBMENUTREE_DISPLAY_BLOCK_TITLES => t('Titles only'),
+            SUBMENUTREE_DISPLAY_BLOCK_TEASERS => t('Teasers'),
+            SUBMENUTREE_DISPLAY_BLOCK_TEASERS_LINKS => t('Teasers with links'),
+            SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT => t('Full text'),
+            SUBMENUTREE_DISPLAY_BLOCK_FULLTEXT_LINKS => t('Full text with links'),
+            ),
+        ),
+        '#default_value' => $node->siblingmenutree_display,
+        '#description' => t('Select where and how the siblingmenu tree should be displayed. If selecting a block display, the block also needs to be made visible.'),
+      ),
+
+      'siblingmenutree_weight' => array(
+        '#type' => 'weight',
+        '#title' => t('Weight'),
+        '#default_value' => $node->siblingmenutree_weight,
+        '#description' => t('The weight of the siblingmenu tree listing. This only applies when displaying as content and affects where the siblingmenu tree appears in the content.'),
+      ),
+    );
+  }
+}
+
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function submenutree_nodeapi(&$node, $op, $teaser, $page) { 
+  switch ($op) {
+    case 'delete':
+      db_query('DELETE FROM {node_submenutree} WHERE nid = %d', $node->nid);
+      break;
+
+    case 'load':
+      $additions = db_fetch_array(db_query('SELECT submenutree_enable, submenutree_title, submenutree_display, submenutree_weight, siblingmenutree_enable, siblingmenutree_title, siblingmenutree_display, siblingmenutree_weight FROM {node_submenutree} WHERE nid = %d', $node->nid));
+      if ($additions)
+        return $additions;
+      break;
+
+    case 'update':
+      if (!$node->submenutree_enable && !$node->siblingmenutree_enable) {
+        db_query('DELETE FROM {node_submenutree} WHERE nid = %d', $node->nid);
+      }
+      // deliberate fullthrough
+
+    case 'insert':
+      if ($node->submenutree_enable || $node->siblingmenutree_enable) {
+        // SQL INSERT or UPDATE depending on whether a row already exists
+        $result = db_num_rows(db_query('SELECT * FROM {node_submenutree} WHERE nid = %d', $node->nid));
+        if ($result > 0)
+          db_query("UPDATE {node_submenutree} SET submenutree_enable = %d, submenutree_title = '%s', submenutree_display = %d, submenutree_weight = %d, siblingmenutree_enable = %d, siblingmenutree_title = '%s', siblingmenutree_display = %d, siblingmenutree_weight = %d WHERE nid = %d", $node->submenutree_enable, $node->submenutree_title, $node->submenutree_display, $node->submenutree_weight, $node->siblingmenutree_enable, $node->siblingmenutree_title, $node->siblingmenutree_display, $node->siblingmenutree_weight, $node->nid);
+        else 
+          db_query("INSERT INTO {node_submenutree} (nid, submenutree_enable, submenutree_title, submenutree_display, submenutree_weight, siblingmenutree_enable, siblingmenutree_title, siblingmenutree_display, siblingmenutree_weight) VALUES (%d, %d, '%s', %d, %d, %d, '%s', %d, %d)", $node->nid, $node->submenutree_enable, $node->submenutree_title, $node->submenutree_display, $node->submenutree_weight, $node->siblingmenutree_enable, $node->siblingmenutree_title, $node->siblingmenutree_display, $node->siblingmenutree_weight);
+      }
+      break;
+
+    case 'submit':
+      // copy fields from $node->menu['submenutree']['submenutree_*'] to ['submenutree_*'] if necessary
+      // Shouldn't drupal flatten these form fields already? Apparently not
+      if (!empty($node->menu['submenutree'])) {
+        foreach ($node->menu['submenutree'] as $k => $v)
+          $node->$k = $v;
+      }
+      if (!empty($node->menu['siblingmenutree'])) {
+        foreach ($node->menu['siblingmenutree'] as $k => $v)
+          $node->$k = $v;
+      }
+      break;
+
+    case 'view':
+      // Calling a helper function because it's too big to live in the switch
+      submenutree_nodeapi_view($node, $op, $teaser, $page);
+      break;
+  }
+}
+
+
+function submenutree_nodeapi_view(&$node, $op, $teaser, $page) {
+  $menu = menu_get_menu();
+  $node_path = 'node/' . $node->nid;
+  if ($teaser == false && $page == true && isset($menu['path index'][$node_path])) {
+    $mid = $menu['path index'][$node_path];
+    if ($node->submenutree_enable) {
+      _submenutree_menutree_view($node, 'submenutree', $mid);
+    }
+    if ($node->siblingmenutree_enable) {
+      $pid = $menu['items'][$mid]['pid'];
+      if ($pid != 0) 
+        _submenutree_menutree_view($node, 'siblingmenutree', $pid);
+    }
+  }
+}
+
+
+/**
+ * Implementation of hook_block().
+ */
+function submenutree_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[SUBMENUTREE_BLOCK_SUBMENU]['info'] = t('Submenu Tree Display');
+    $blocks[SUBMENUTREE_BLOCK_SIBLINGMENU]['info'] = t('Siblingmenu Tree Display');
+    return $blocks;
+  } 
+  else if ($op == 'view') {
+    return _submenutree_get_block_content($delta);
+  }
+}
+
+
+/**
+ * View the menu tree, either by poking into $node->content, or via the block functions
+ * 
+ * @param $node
+ *   The node being operated upon. This is also used for configuration information. 
+ * @param $type
+ *   The type of menu to produce, either "submenutree" or "siblingmenutree"
+ * @param $mid
+ *   The menu to be viewed
+ */
+
+function _submenutree_menutree_view(&$node, $type, $mid) {
+  // grab config from $node, depending on $type
+  $config_item = $type . '_title';
+  $title = $node->$config_item;
+  $config_item = $type . '_display';
+  $display = intval($node->$config_item) & SUBMENUTREE_DISPLAY_BLOCK_MASK;
+  $display_in_block = intval($node->$config_item) & ~SUBMENUTREE_DISPLAY_BLOCK_MASK;
+  $config_item = $type . '_weight';
+  $weight = $node->$config_item;
+
+  // tweak $title
+  if ($display_in_block) {
+    $block_title = $title;
+    if ($block_title == '')
+      $block_title = $node->title;
+    // wipe out $title so it doesn't get passed into the theme functions
+    $title = null;
+  }
+  else {
+    if ($title == '')
+      $title = null;
+  }
+
+  $menu = menu_get_menu();
+  $children = $menu['items'][$mid]['children'];
+  $output = '';
+  if ($display == SUBMENUTREE_DISPLAY_MENU) {
+    $output = theme('submenu_tree_menu', $mid, $title);
+  }
+  else {
+    $items = array();
+    // Note $v is a menu item mid, not a node nid
+    // Only process nonnegative mid values to build 
+    //   our list of children
+    foreach ($children as $k => $v) {
+      if ($v >= 0) {
+        $child_path = $menu['items'][$v]['path'];
+        $match = array();
+        $result = preg_match('!node/(.+)!', $child_path, $match);
+        if ($result && $match[1] > 0) {
+          $child = node_load(array('nid' => $match[1]));
+          $items[] = array('node' => $child, 'weight' => $menu['items'][$v]['weight'], 'title' => $menu['items'][$v]['title']);
+        }
+      }
+    }
+    _submenutree_sort_items($items);
+
+    // Now render our links or our nodes
+    $links = false;
+    switch ($display) {
+      case SUBMENUTREE_DISPLAY_TITLES:
+        $output = theme('submenu_tree_titles', $items, $title);
+        break;
+
+      case SUBMENUTREE_DISPLAY_TEASERS_LINKS:
+        $links = true;
+      case SUBMENUTREE_DISPLAY_TEASERS:
+        $output = theme('submenu_tree_teasers', $items, $title, $links);
+        break;
+
+      case SUBMENUTREE_DISPLAY_FULLTEXT_LINKS:
+        $links = true;
+      case SUBMENUTREE_DISPLAY_FULLTEXT:
+        $output = theme('submenu_tree_fulltext', $items, $title, $links);
+        break;
+    }
+  }
+
+  if ($output) {
+    if ($display_in_block == 0) {
+      $node->content[$type] = array(
+        '#value' => $output,
+        '#weight' => $weight,
+      );
+    }
+    else {
+      $blocks_map = array(
+        'submenutree' => SUBMENUTREE_BLOCK_SUBMENU, 
+        'siblingmenutree' => SUBMENUTREE_BLOCK_SIBLINGMENU, 
+      );
+      _submenutree_set_block_content($blocks_map[$type], array('subject' => $block_title, 'content' => $output));
+    }
+  }
+}
+
+
+/**
+ * $block should be an array like those used in hook_block
+ *    ie array('subject' => 'title', 'content' => 'some content');
+ */
+function _submenutree_set_block_content($delta, $block = null) {
+  static $stored_content = array(
+    SUBMENUTREE_BLOCK_SUBMENU => array(),
+    SUBMENUTREE_BLOCK_SIBLINGMENU => array(),
+  );
+
+  if (isset($block) && is_array($block)) {
+    $stored_content[$delta] = $block;
+  }
+  return $stored_content[$delta];
+}
+
+
+function _submenutree_get_block_content($delta) {
+  return _submenutree_set_block_content($delta);
+}
+
+
+/**
+ * Sort an array of items.
+ * 
+ * @param $items
+ *   The array of items to be sorted.
+ */
+function _submenutree_sort_items(&$items) {
+  usort($items, '_submenutree_sort_items_compare');
+}
+
+
+/**
+ * Compare two items by weight then title.
+ *
+ * @param a
+ *   The first item to compare.
+ * @param b
+ *   The second item to compare.
+ * @return
+ *   An integer less than, equal to, or greater than zero if $a is considered
+ *   to be respectively less than, equal to, or greater than $b.
+ */
+function _submenutree_sort_items_compare($a, $b) {
+  $ret = $a['weight'] - $b['weight'];
+  if ($ret == 0) {
+    $ret = strcasecmp($a['title'], $b['title']);
+  }
+  return $ret;
+}
+
+
+function theme_submenu_tree_menu($mid, $title = null) {
+  $output = '';
+  if (isset($title))
+    $output .= '<h3>'. $title .'</h3>';
+  $output .= theme('menu_tree', $mid);
+  return $output;
+}
+
+
+function theme_submenu_tree_titles($items, $title = null) {
+  $list = array();
+  foreach ($items as $item) {
+    $list[] = l($item['node']->title, 'node/' . $item['node']->nid);
+  }
+  return theme('item_list', $list, $title);
+}
+
+
+function theme_submenu_tree_teasers($items, $title = null, $links) {
+  $output = '';
+  if (isset($title))
+    $output .= '<h3>'. $title .'</h3>';
+  foreach ($items as $item) {
+    $output .= node_view($item['node'], true, false, $links);
+  }
+  return $output;
+}
+
+
+function theme_submenu_tree_fulltext($items, $title = null, $links) {
+  $output = '';
+  if (isset($title))
+    $output .= '<h3>'. $title .'</h3>';
+  foreach ($items as $item) {
+    $output .= node_view($item['node'], false, false, $links);
+  }
+  return $output;
+}
+
+

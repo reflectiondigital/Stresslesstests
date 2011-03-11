@@ -1,0 +1,1789 @@
+<?php
+/**
+ * @file
+ *  Mail to a group as selected by a views view
+ *
+ * @todo
+ *
+ *  - set up userreference and nodereference fields to use the name and email of the userreference and nodereference uid
+ *  - incorporate Token module to handle substitutions
+ *  - scheduling does nothing right now, all mail is sent immediately, add hook into actions module to schedule mail
+ *  - add logging of sent emails, either name and date or name, date and message, that can be sorted and viewed by recipient and/or sender
+ *  - wouldn't mind just creating the messages and sending them off to some other module to handle the mailing and logging
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function views_mail_help($section) {
+  switch ($section) {
+    case 'admin/help#description':
+      return views_mail_helptext();
+    case 'admin/settings/views_mail':
+      return views_mail_helptext();
+  }
+}
+
+function views_mail_helptext() {
+  $description = t('<p>');
+  $description = t('All views that have Views Mail selected as a page type will have a collapsed fieldset above the view that contains an email message form. The message form will be displayed only to users with permissions to send mail.');
+  $description .= t('<p>Views Mail views should include fields for each value that will be used as recipient names or addresses and any values that can be substituted into the email message itself. Give each field a unique and descriptive label.</p>');
+  $description .= t('<p>Mail will only be sent to recipients in the visible page of multi-page views. You may want to adjust your view settings to be sure that the records that should be mailed to are visible on the same page. </p>');
+  return $description;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function views_mail_perm() {
+  return array('send views mail', 'administer views mail', 'send own views mail');
+}
+
+function views_mail_menu($may_cache) {
+  $items = array();
+  if ($may_cache) {
+    $items[] = array(
+      'path' => 'admin/settings/views_mail',
+      'title' => t('Views mail configuration'),
+      'description' => t('Configure email capabilities for Views.'),
+      'callback' => 'views_mail_settings',
+      'access' => user_access('administer views mail'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items[] = array('path' => 'views_mail/confirm',
+      'title' => t('Confirm Views Mail subscriptions'),
+      'callback' => 'views_mail_confirm_subscription',
+      'access' => user_access('subscribe to newsletters'),
+      'type' => MENU_CALLBACK,
+    );
+  }
+  return $items;
+}
+
+/**
+ *  Implementation of hook_settings()
+ */
+function views_mail_settings() {
+  return drupal_get_form('views_mail_settings_form');
+}
+
+/**
+ *  Create alias fields in the view for to_name and to_mail
+ */
+function views_mail_views_query_alter(&$query, &$view, $summary, $level) {
+  if ($view->page_type == 'views_mail' && !$summary
+    && ($view->build_type == 'page' || $view->build_type == 'items')
+    && (user_access('send views mail') || user_access('send own views mail'))) {
+    return _views_mail_query_alter($query, $view, $summary, $level);
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ *
+ * Provide form element to opt in to content mailouts.
+ */
+function views_mail_user($type, $edit, &$user, $category = NULL) {
+  if ($type == 'register' || ($type == 'form' && $category == 'account')) {
+    $form['views_mail'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Group e-mail settings'),
+      '#weight' => 5,
+      '#collapsible' => TRUE,
+    );
+
+	// Force checkbox to default on if this is first time registration;
+
+	if ($type == 'register') {
+
+		// If force group email setting, then hide group e-mail settings checkbox on registration
+		// because it will default to "on".
+
+		$type = 'checkbox';
+		$opt_in = variable_get("views_mail_force_mail_accept", 0);
+		if ($opt_in == 1) $type = 'hidden';
+
+	    $form['views_mail']['views_mail_accept'] = array(
+	      '#type' => $type,
+    	  '#title' => t('Accept email'),
+	      '#default_value' => 1,
+    	  '#description' => t('Allow yourself to be included in group e-mails from privileged users. Note that your e-mail address is not made public and that site administrators are able to email you even if you choose not to enable this feature.'),
+	    );
+	} else {
+	    $form['views_mail']['views_mail_accept'] = array('#type' => 'checkbox',
+    	  '#title' => t('Accept email'),
+	      '#default_value' => $edit['views_mail_accept'],
+    	  '#description' => t('Allow yourself to be included in group e-mails from privileged users. Note that your e-mail address is not made public and that site administrators are able to email you even if you choose not to enable this feature.'),
+	    );
+	}
+
+    return $form;
+  } // end register if
+
+  if ($type == 'validate') {
+    return array('views_mail_accept' => $edit['views_mail_accept']);
+  } // end validate if
+
+  if ($type == "insert") {
+	// Subscribe this user to the newsletter if it exists
+	$str = variable_get("views_mail_subscribe_newsletter", '');
+	if (!empty($str)) {
+		$array = preg_split('/\|/', $str, -1, PREG_SPLIT_NO_EMPTY); // split at the | = newsletter | comment
+		if (!empty($array)) {
+			$newsletter = $array[0];
+			simplenews_subscribe_user($user->mail, $newsletter, $confirm = FALSE);					
+		} // end if					
+	} // end if
+  } // end insert if
+
+}
+
+
+/**
+ *  Implementation of hook_views_style_plugins()
+ */
+function views_mail_views_style_plugins() {
+  $plugins['views_mail'] = array(
+    'name' => t('Views mail'),
+    'theme' => 'views_mail_display',
+    'needs_fields' => TRUE,
+    'needs_table_header' => TRUE,
+    );
+  return $plugins;
+}
+
+/**
+ *  Calendar Views plugin theme, overrides default views theme
+ */
+function theme_views_mail_display(&$view, &$items, $type) {
+  // TODO - if this is only a partial view, may want to enlarge view
+  if ($view->use_pager && sizeof($items) == $view->nodes_per_page) {
+    // for now doing nothing and only mailing to the visible portion of the view
+  }
+  $output = drupal_get_form('views_mail_mail_form', $view, $items);
+  // In later steps we want to hide $items and only display info about the mail recipients.
+  if ($_SESSION['views_mail']['step'] < 2) {
+    $view->table_header = _views_construct_header($view, _views_get_fields());
+    $output .= theme('views_view_table', $view, $items, $type);
+  }
+  return $output;
+}
+
+/**
+ * The Views Mail settings form.
+ *
+ * @return array $form
+ */
+function views_mail_settings_form() {
+  $form['#suffix'] = $explanation;
+
+  $form['views_mail_email_default_newsletter'] = array(
+	'#type' => 'select',
+	'#title' => t('Default newsletter'),
+	'#default_value' => variable_get('views_mail_email_default_newsletter', ''),
+	'#options' => views_mail_default_newsletters(),
+	'#description' => t('The default newsletter which contains the newsletter issues that Views Mail will select from.'),
+   	'#required' => TRUE,
+	);
+
+  $form['views_mail_force_mail_accept'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Force group e-mail opt-in'),
+    '#default_value' => variable_get('views_mail_force_mail_accept', 1),
+    '#description' => t('When new user signs up, force the group e-mail opt-in to be checked, even if user unchecks it on signup.')
+    );
+
+  $form['views_mail_format_subject'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Format the subject line of emails?'),
+    '#default_value' => variable_get('views_mail_format_subject', 1),
+    '#description' => t('When a newsletter is created, the subject line of the resulting email will be prepended with the name of the newsletter group.  Uncheck this box if you want the subject of the email to only contain the title of the saved newsletter.')
+    );
+
+  $form['link settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Link Settings'),
+    '#collapsible' => true,
+    '#weight' => -5,
+    );
+  $form['link settings']['views_mail_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create Views Mail link?'),
+    '#default_value' => variable_get('views_mail_link', 0),
+    '#description' => t('When you create a Views Mail newsletter, do you wish to display a link on the bottom of this newsletter which will take you to the Views Mail view you have created?')
+    );
+  $form['link settings']['views_mail_link_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Views Mail link URL'),
+    '#default_value' => variable_get('views_mail_link_url', ''),
+    '#description' => t('Enter the URL to the Views Mail view you have created. Do NOT include the ending \'/\'. Ex: <strong>myviewsmailview</strong> or <strong>og/emailmembersbyrole</strong> or <strong>http://mywebsite.org/viewsmailview</strong>')
+    );
+  $form['link settings']['views_mail_link_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Views Mail link title'),
+    '#default_value' => variable_get('views_mail_link_title', ''),
+    '#description' => t('Enter the title of the link.')
+    );
+
+  $form['views_mail_subscribe_newsletter'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Subscribe all new signups to newsletter'),
+	'#default_value' => variable_get('views_mail_subscribe_newsletter', ''),
+    '#cols' => 80,
+   	'#rows' => 1,
+    '#description' => t('Specify here the Simplenews newsletter ID number to which you want ALL new signups
+    	to be subscribed. You only need to enter the newsletter ID (TID) number.  If no number is entered
+    	here, then new signups to the site will not be automatically subscribed to a newsletter.  If a number
+    	is entered here, then all new signups to the site will be automatically subscribed to the Simplenews
+    	newsletter whose ID number is entered. 	Structure your entries like this:
+      	<strong>
+      	<p>newsletterID|comments<br /></p>
+		For example:
+		<br>63|Subscribe all new users to Brix Realty Inc</br>
+		</strong>
+   	  	<p>Only one newsletter ID can be entered.</p>'),
+	);
+  $form['views_mail_subscribe_group_newsletter'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Groups whose new users are autosubscribed to newsletters'),
+	'#default_value' => variable_get('views_mail_subscribe_group_newsletter', ''),
+    '#cols' => 80,
+   	'#rows' => 10,
+    '#description' => t('Specify here the node IDs of groups whose new members you wish to be subscribed to Simplenews 
+    	newsletters. You enter the group ID number, followed by a | character followed by the newsletter ID number to use for 
+    	subscriptions followed by another | and whatever comments you have for this groupID|newsletterID pair. 
+    	Structure your entries like this:
+      	<strong>
+      	<p>groupID|newsletterID|comments<br /></p>
+		For example:
+		<br>12|63|Beverly Hills subscibe to Brix Realty Inc</br>
+		<br>13|64|Encino Terrace subscribe to Mail Views</br>
+		</strong>
+   	  	<p>Each groupID|newsletterID pair must be on a separate separated by a linefeed.</p>'),
+	);
+
+  $form['test settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Test Settings'),
+    '#collapsible' => true,
+    '#weight' => -10,
+    );
+  $form['test settings']['views_mail_email_test_mode'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Email test mode'),
+    '#default_value' => variable_get('views_mail_email_test_mode', 1),
+    '#description' => t('When test mode is on, emails will not actually be sent to recipients. Uncheck this option when ready to start sending actual emails.')
+    );
+  $form['test settings']['views_mail_email_test_send'] = array(
+    '#type' => 'select',
+    '#title' => t('Email test handling'),
+    '#default_value' => variable_get('views_mail_email_test_send', 0),
+    '#options' => array(
+      0 => t('Display to sender, do not send'),
+      1 => t('Send to test email address instead of recipient address'),
+      ),
+    );
+  $form['test settings']['views_mail_email_test_address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email test address'),
+    '#default_value' => variable_get('views_mail_email_test_address', variable_get('site_mail', '')),
+    );
+
+
+  return system_settings_form($form);
+}
+
+function views_mail_fields($view, $reset = FALSE) {
+  static $options;
+  if ($reset || empty($options)) {
+    $options = array();
+  }
+  if ($reset || empty($options[$view->vid])) {
+    $options = array();
+    $options[$view->vid]['name']['author_name'] = t('Node author name');
+    $options[$view->vid]['mail']['author_mail'] = t('Node author email');
+    $fields = _views_get_fields();
+    foreach ($view->field as $key => $field) {
+      if ($fields[$field['fullname']]['content_field']['type'] == 'nodereference') {
+        $nlabel = t('Nodereference author name: ');
+        $mlabel = t('Nodereference author mail: ');
+      }
+      elseif ($fields[$field['fullname']]['content_field']['type'] == 'userreference') {
+        $nlabel = t('Userreference name: ');
+        $mlabel = t('Userreference mail: ');
+      }
+      else {
+        $nlabel = t('Field value: ');
+        $mlabel = t('Field value: ');
+      }
+      $options[$view->vid]['name'][$field['queryname']] = $nlabel ._views_mail_get_label($field['queryname'], $field['label']);
+      $options[$view->vid]['mail'][$field['queryname']] = $mlabel . _views_mail_get_label($field['queryname'], $field['label']);
+    }
+  }
+  return $options[$view->vid];
+}
+
+/**
+ * The Views Mail form displayed in views_pre_view().
+ *
+ * @param objec $view
+ * @param array $items
+ * @param array $form_values
+ * @return array $form
+ */
+function views_mail_mail_form($view, $items, $form_values = NULL) {
+  if (isset($form_values) && ($form_values['op'] != t('Cancel') || $form_values['op'] != t('Return'))) {
+    $step = intval($form_values['step'] + 1);
+  }
+  else {
+    $step = 1;
+  }
+  $form['#multistep'] = TRUE;
+  $form['#redirect'] = FALSE;
+
+  // May need to alter this value if the multistep form gets stuck and won't go past a step.
+  $form['#skip_duplicate_check'] = TRUE;
+
+  $_SESSION['views_mail']['step'] = $step;
+  switch ($step) {
+    case 1:
+      // CREATE MESSAGE
+      $form['step'] = array('#type' => 'hidden', '#value' => $step);
+      $hidden = array('from', 'from_name');
+      $comment = t('Send a message using information from the view below. Select the fields that represent the recipient name and email address. The subject line will be that of the newsletter selected.');
+      $form['#theme'] = 'views_mail_form';
+      $substitutions = views_mail_get_substitutions($view);
+      $form_values['substitutions'] = serialize($substitutions);
+      $form['substitutions'] = array('#type' => 'hidden', '#value' => $form_values['substitutions']);
+      $form += views_mail_message_form($view, $form_values, $comment, $hidden);
+      $form['group']['submit'] = array('#type' => 'submit', '#value' => t('Send'));
+      return $form;
+
+    case 2:
+      // CONFIRM LIST
+
+      $form['step'] = array('#type' => 'hidden', '#value' => $step);
+      $form['#theme'] = 'views_mail_form';
+      $comment .= t('OK to send to %number recipients?', array('%number' => number_format(sizeof($_SESSION['views_mail']['recipients']))));
+      if ($form_values['update']) $comment .= t(' <em>Note: This list will be updated when sent, and the number of recipients may change.</em>');
+      $comment = '<p>'. $comment .'</p>';
+
+      // Show the form again, but display the values instead of allowing them to be input.
+      $hidden = array('subject', 'newsletter', 'message', 'number', 'unit', 'from', 'from_name', 'to_name', 'to_mail', 'distinct');
+      $form += views_mail_message_form($view, $form_values, $comment, $hidden);
+      $form['group']['#collapsible'] = FALSE;
+      $form['group']['confirm'][] = array('#type' => 'submit', '#value' => t('Confirm'));
+      $form['group']['confirm'][] = array('#type' => 'submit', '#value' => t('Cancel'));
+      $form['#suffix'] = theme('views_mail_recipients_list', $_SESSION['views_mail']['recipients']);
+      if ($_SESSION['views_mail']['rejects']) {
+        $form['#suffix'] .= theme('views_mail_rejects_list', $_SESSION['views_mail']['rejects']);
+	  }
+      return $form;
+
+    case 3:
+      // SEND MAIL
+      // unset the view items so they don't display on this screen and show results instead.
+      $form['submit'] = array('#type' => 'submit', '#value' => t('Return'));
+      return $form;
+  }
+}
+
+/**
+ * Multistep form submit handler.
+ * Do things that must only be done once in this step.
+ * Actions in the multistep form itself will end up getting triggered more than once.
+ */
+function views_mail_mail_form_submit($form_id, $form_values) {
+  // Store the form values in a variable so they can be accessed by views_query_alter().
+  $view = $GLOBALS['current_view'];
+  switch ($form_values['step']) {
+    case 1:
+      views_mail_warning();
+      $form_values['substitute'] = $form_values['update']  ? FALSE : (strstr($form_values['message'], '%') ? TRUE : FALSE);
+      $form_values['distinct']   = isset($form_values['distinct']) ? intval($form_values['distinct']) : 1;
+      // Store the form values in a variable so they can be accessed by views_query_alter().
+      variable_set('views_mail_form_values_'.$view->vid, $form_values);
+      // Rerun the query to get the recipient name and email fields.
+//      $items = views_build_view('items', $view, $view->args, $view->use_pager, $view->limit, $view->page, $view->offset, $view->filters);
+//
+// Modification - Removed "pager" option as per: http://drupal.org/node/153632
+//
+      $items = views_build_view('items', $view, $view->args, 0, $view->limit, $view->page, $view->offset, $view->filters);
+      views_mail_get_recipients($form_values, $view, $items['items']);
+      break;
+    case 2:
+      views_mail_warning();
+      if ($form_values['op'] != t('Return') && $form_values['op'] != t('Cancel')) {
+        // TODO check if using scheduled mail and create an action item instead of mailing immediately.
+        $view = $GLOBALS['current_view'];
+        $recipients = $_SESSION['views_mail']['recipients'];
+        return _views_mail_send_mail($form_values, $recipients, $view);
+      }
+      break;
+  }
+}
+
+/**
+ *  Prepare a message input form.
+ *
+ *  @param $form_values - the form values array for this form.
+ *  @param $comment - the description for the form fieldset.
+ *  @param $hidden - an array of elements that should be displayed instead of input,
+ *   values are added as hidden values and displayed to user, used when form values are confirmed.
+ */
+function views_mail_message_form($view, $form_values, $comment, $hidden = array()) {
+  $user = $GLOBALS['user'];
+  $substitutions = (array) unserialize($form_values['substitutions']);
+  $form['group'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Send Mail'),
+    '#collapsible' => TRUE,
+    '#collapsed' => !empty($form_values['subject']) ? FALSE : TRUE,
+    '#description' => $comment,
+	'#access' => (user_access('send views mail') || user_access('send own views mail')),
+    );
+  $options = views_mail_fields($view);
+  if (in_array('to_name', $hidden)) {
+    $form['message'] = array('#type' => 'hidden', '#value' => $form_values['to_name']);
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'to_name', $form_values['to_name']));
+  } else{
+    $form['group']['to_name'] = array(
+      '#type' => 'select',
+      '#title' => t('Recipient name'),
+      '#default_value' => !empty($form_values['to_name']) ? $form_values['to_name'] : 'author_name',
+      '#options' => $options['name'],
+      '#multiple' => FALSE,
+      //'#required' => TRUE,
+    );
+  }
+  if (in_array('to_mail', $hidden)) {
+    $form['message'] = array('#type' => 'hidden', '#value' => $form_values['to_mail']);
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'to_mail', $form_values['to_mail']));
+  } else{
+    $form['group']['to_mail'] = array(
+      '#type' => 'select',
+      '#title' => t('Recipient email'),
+      '#default_value' => !empty($form_values['to_mail']) ? $form_values['to_mail'] : 'author_mail',
+      '#options' => $options['mail'],
+      '#multiple' => FALSE,
+      //'#required' => TRUE,
+    );
+  }
+
+  	if ($hidden) $form['group']['display'][] = array('#type' => 'markup', '#value' => '<dl>');
+
+  	$from_name = !empty($form_values['from_name']) ? $form_values['from_name'] : $user->name;
+  	$from_mail = !empty($form_values['from']) ? $form_values['from'] : $user->mail;
+	
+	if (in_array('from_name', $hidden)) {
+    	$form['from_name'] = array('#type' => 'hidden', '#value' => $from_name);
+	    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'from_name', $form_values['from_name']));
+	  } else{
+    	$form['group']['from_name'] = array(
+	      '#type' => 'textfield',
+    	  '#title' => t('From name'),
+	      '#default_value' => $from_name,
+    	  '#maxlength' => '50',
+	      '#required' => TRUE,
+    	  );
+	  }
+
+	  if (in_array('from', $hidden)) {
+	    $form['from'] = array('#type' => 'hidden', '#value' => $from_mail);
+    	$form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'from', $form_values['from']));
+	  } else{
+    	$form['group']['from'] = array(
+	      '#type' => 'textfield',
+    	  '#title' => t('From address'),
+	      '#default_value' => $from_mail,
+    	  '#maxlength' => '50',
+	      '#required' => TRUE,
+    	  );
+	  }
+
+//  if (in_array('subject', $hidden)) {
+//    $form['subject'] = array('#type' => 'hidden', '#value' => $form_values['subject']);
+//    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'subject', $form_values['subject']));
+//  } else{
+//    $form['group']['subject'] = array(
+//      '#type' => 'textfield',
+//      '#title' => t('Subject'),
+//      '#default_value' => $form_values['subject'],
+//      '#maxlength' => '130',
+//      '#required' => TRUE,
+//      );
+//  }
+  if (in_array('newsletter', $hidden)) {
+    $form['newsletter'] = array('#type' => 'hidden', '#value' => $form_values['newsletter']);
+    $display = views_mail_get_node_field($form_values['newsletter'], 'title') . " (" . $form_values['newsletter'] . ")";
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'newsletter', $display));
+  } else{
+		$form['group']['newsletter'] = array(
+  			'#type' => 'select',
+  			'#title' => t('Newsletter to send to this group'),
+  			'#default_value' => $form_values['newsletter'],
+  			'#options' => views_mail_newsletters(),
+  		'#description' => t('The newsletter that contains the message to be sent.'),
+      	'#required' => TRUE,
+		);
+  }
+
+  if (in_array('message', $hidden)) {
+	$form_values['message'] = views_mail_get_node_field($form_values['newsletter'], 'body');
+    $form['message'] = array('#type' => 'hidden', '#value' => $form_values['message']);
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'message', $form_values['message']));
+  } else{
+  	$form['group']['message'] = array(
+    	'#type' => 'hidden',
+    	'#value' => views_mail_get_node_field($form_values['newsletter'], 'body'),
+    );
+//
+// No need for message box in form
+//
+//    $form['group']['message'] = array(
+//      '#type' => 'textarea',
+//      '#title' => t('Message'),
+//      '#default_value' => views_mail_get_node_field($form_values['newsletter'], 'body'),
+//      '#rows' => '0',
+//      '#required' => FALSE,
+//      '#description' => t('The message that should be sent. This should come from the newsletter selected.'),
+//      );
+  }
+
+  if (in_array('distinct', $hidden)) {
+    $form['message'] = array('#type' => 'hidden', '#value' => $form_values['distinct']);
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'distinct', $form_values['distinct']));
+  } else{
+    $form['group']['distinct'] = array(
+      '#type' => 'select',
+      '#title' => t('Distinct'),
+      '#default_value' => isset($form_values['distinct']) ? $form_values['distinct'] : 1,
+      '#options' => array(1 => t('Yes'), 0 => t('No')),
+      '#multiple' => FALSE,
+      '#description' => t('Send only to distinct email addresses? If Yes, only one message will be sent to any one recipient. Set to No if you are customizing the message with information from selected records to be sure a different message is sent for each one.'),
+    );
+  }
+
+  if (in_array('number', $hidden)) {
+    $form['number'] = array('#type' => 'hidden', '#value' => $form_values['number']);
+    $form['unit'] = array('#type' => 'hidden', '#value' => $form_values['unit']);
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'number', $form_values['number']));
+    $form['group']['display'][] = array('#type' => 'markup', '#value' => theme('views_mail_form_display', 'unit', $form_values['unit']));
+   } else{
+    $form['group']['schedule'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Schedule'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#description' => t('Set time period to wait before sending this message.'),
+      );
+
+    $form['group']['schedule']['number'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Number'),
+      '#required' => true,
+      '#size' => 3,
+      '#default_value' => $form_values['number'] ? $form_values['number'] : 0,
+    );
+
+    $form['group']['schedule']['unit'] = array(
+      '#type' => 'select',
+      '#title' => t('Unit'),
+      '#options' => array(
+        '1' => 'seconds',
+        '60' => 'minutes',
+        '3600' => 'hours',
+        '86400' => 'days',
+        'weekdays' => 'weekdays'
+      ),
+      '#default_value' => $form_values['unit'] ? $form_values['unit'] : 86400,  
+    );
+  }
+
+  $form['group']['vid'] = array(
+    '#type' => 'hidden',
+    '#value' => $view->vid,
+    );
+
+  return $form;
+}
+
+/**
+ * Display a warning to the user if email is still in test mode.
+ *
+ */
+function views_mail_warning() {
+  // Warn if we are still in test mode.
+  $test      = variable_get('views_mail_email_test_mode', 1);
+  $test_send = variable_get('views_mail_email_test_send', 0);
+  if ($test) {
+    if (!$test_send) {
+      $message = t('mail will be displayed and not sent.');
+    }
+    else {
+      $message = t('mail will be sent to test email address @address.', array('@address' => variable_get('views_mail_email_test_address', variable_get('site_mail', ''))));
+    }
+    drupal_set_message(t('Views Mail test mode is on.') . $message . t('Turn test mode off at !link', array(
+      '!link' => l('admin/settings/views_mail', 'admin/settings/views_mail'))
+      ), 'error');
+  }
+}
+
+/**
+ *  Global substitution array
+ */
+function _views_mail_global_subs($node = NULL, $recipient = NULL) {
+  $variables = array(
+    '%site_name' => variable_get('site_name', ''),
+    '%recipient_name' => $recipient['name'],
+    '%recipient_mail' => $recipient['mail'],
+    '%node_nid'    => $node ? $node->nid : 0,
+    '%node_uid'    => $node ? $node->uid : 0,
+    '%node_url'    => $node ? url('node/' . $node->nid, NULL, NULL, TRUE) : '',
+    '%node_type'   => $node ? $node->type : '',
+    '%node_title'  => $node ? $node->title : '',
+    '%node_teaser' => $node ? node_view($node, true, false, false) : '',
+    '%node_body'   => $node ? node_view($node, false, false, false) : '',
+    );
+  return $variables;
+}
+
+function _views_mail_get_label($field, $label) {
+  return ($label ? str_replace(' ', '', $label) : $field);
+}
+
+function views_mail_get_substitutions($view) {
+  $substitutions = array();
+  foreach ($view->field as $field) {
+    $substitutions['%'. ($field['label'] ? str_replace(' ', '', $field['label']) : $field['queryname'])] = $field['queryname'];
+  }
+  $node = new StdClass();
+  $node->nid = 0;
+  $substitutions += _views_mail_global_subs($node, $recipient);
+  return $substitutions;
+}
+
+/**
+ *  Create a recipient list from the filtered view.
+ *
+ *  TODO - is it best to store it in a SESSION or add it to the form_values?
+ *    it could be a  long list, so assuming the SESSION option is better.
+ */
+function views_mail_get_recipients($form_values, $view, $items) {
+  if (empty($items)) {
+    return;
+  }
+
+  $substitutions = unserialize($form_values['substitutions']);
+  $substitute    = $form_values['substitute'] ? $form_values['substitute'] : TRUE;
+  $message       = $form_values['message'] ? $form_values['message'] : '';
+  $distinct      = isset($form_values['distinct']) ? $form_values['distinct'] : 1;
+
+  $recipients = array();
+  $used_mails = array();
+  $rejects = array();
+
+  // iterate through each row of the query results
+  foreach ($items as $row_no => $row) {
+    // reset variables
+    $list = array();
+	$rejected = array();
+    $invalid = false;
+    if (!empty($row->to_name) && !empty($row->to_mail) && !in_array($row->to_mail, $used_mails)) {
+
+      // Check opt out table
+        $optout = views_mail_check_optout($row->to_mail);
+        if (!$optout) {
+          $list['name'] = $row->to_name;
+          $list['mail'] = $row->to_mail;
+          if ($distinct) $used_mails[] = $row->to_mail;
+		} else {
+          $rejected['name'] = $row->to_name;
+          $rejected['mail'] = $row->to_mail;
+          $rejected['message'] = '';
+          if ($distinct) $used_mails[] = $row->to_mail;
+		}
+
+    }
+    else {
+      $invalid = TRUE;
+    }
+
+    // if the message needs substitutions based on current record, make them now
+    if ($substitute && !$invalid) {
+      $replace = array();
+      foreach ($substitutions as $from => $to) {
+        if (isset($to)) {
+          if (isset($row->$to)) {
+            $replace[$from] = $row->$to;
+           }
+        }
+      }
+      // Customize the message for this recipient.
+      if (!$node) $node = node_load($row->nid);
+      $replace = $replace + _views_mail_global_subs($node, $list);
+      $list['message'] = strtr($message, $replace);
+    }
+
+    // duplicate mail addresses will be combined
+    // invalid and empty values will be dropped
+    if (!$invalid && $distinct && $list['name'] && $list['mail']) {
+      $recipients[$list['mail']] = $list;
+    }
+    elseif (!$invalid && !$distinct && $list['name'] && $list['mail']) {
+      $recipients[] = $list;
+    }
+    if ($rejected) {
+      $rejects[] = $rejected;
+	}
+    unset($list);
+    unset($rejected);
+  }
+
+  $_SESSION['views_mail']['recipients'] = $recipients;
+  $_SESSION['views_mail']['rejects'] = $rejects;
+
+  return $recipients;
+}
+
+/**
+ * Alter query to add to_name and to_mail fields to the view based on selected preferences.
+ *   This is where we need to get $form_values from a SESSION variable since this is
+ *   not called from within the form.
+ */
+function _views_mail_query_alter(&$query, $view, $summary, $level) {
+  $form_values = variable_get('views_mail_form_values_'.$view->vid, array());
+
+  $to_name = $form_values['to_name'];
+  $to_mail = $form_values['to_mail'];
+  $distinct = $form_values['distinct'];
+
+  if (empty($to_name) || empty($to_mail)) {
+    return;
+  }
+  $set_to_name = FALSE;
+  $set_to_mail = FALSE;
+
+  if ($to_name == 'author_name') {
+    $query->ensure_table('users', true);
+    $query->add_field('name', 'users', 'to_name');
+    $set_to_name = TRUE;
+  }
+  if ($to_mail == 'author_mail') {
+    $query->ensure_table('users', true);
+    $query->add_field('mail', 'users', 'to_mail');
+    $set_to_mail = TRUE;
+  }
+  if (!$set_to_mail || !$set_to_name) {
+    $fields = _views_get_fields();
+    // iterate through each field in this view
+    foreach ($view->field as $field_name => $field) {
+      if ($field['queryname'] == $to_name) {
+        $to_name_view_field = $field['fullname'];
+      }
+      if ($field['queryname'] == $to_mail) {
+        $to_mail_view_field = $field['fullname'];
+      }
+      /*
+      * TODO - This is not working right yet.
+      * Need to get userreference and nodereference fields added into the query properly
+      // Special case for userreference field, get user info.
+      if ($fields[$to_name_view_field]['content_field']['type'] == 'userreference') {
+        $query->add_table('node_userreference', false, 1, array('left' => array('table' => 'user', 'field' => 'uid'), 'right' => array('field' => 'uid')));
+        $query->add_field('name', 'node_userreference', 'to_name');
+        $set_to_name = TRUE;
+      }
+      if ($fields[$to_mail_view_field]['content_field']['type'] == 'userreference') {
+        $query->add_table('node_userreference', false, 1, array('left' => array('table' => 'user', 'field' => 'uid'), 'right' => array('field' => 'uid')));
+        $query->add_field('mail', 'node_userreference', 'to_mail');
+        $set_to_mail = TRUE;
+      }
+      // Special case for nodereference field, get referenced node's user info.
+      if ($fields[$to_name_view_field]['content_field']['type'] == 'nodereference') {
+        $query->add_table('node_nodereference', false, 1, array('left' => array('table' => 'node', 'field' => 'nid'), 'right' => array('field' => $field_name)));
+        $query->add_table('nodereference_user', false, 1, array('left' => array('table' => 'user', 'field' => 'uid'), 'right' => array('field' => 'uid')));
+        $query->add_field('name', 'nodereference_user', 'to_name');
+        $set_to_name = TRUE;
+      }
+      if ($fields[$to_mail_view_field]['content_field']['type'] == 'nodereference') {
+        $query->add_table('node_nodereference', false, 1, array('left' => array('table' => 'node', 'field' => 'nid'), 'right' => array('field' => $field_name)));
+        $query->add_table('nodereference_user', false, 1, array('left' => array('table' => 'user', 'field' => 'uid'), 'right' => array('field' => 'uid')));
+        $query->add_field('mail', 'nodereference_user', 'to_mail');
+        $set_to_mail = TRUE;
+      }
+      */
+    }
+  }
+  // If none of those items were the to name or to mail,
+  // just use the value of the selected field.
+  if (!$set_to_mail) {
+    $parts = explode('.', $to_mail_view_field);
+    $query->add_field($parts[1], $parts[0], 'to_mail');
+  }
+  if (!$set_to_name) {
+    $parts = explode('.', $to_name_view_field);
+    $query->add_field($parts[1], $parts[0], 'to_name');
+  }
+}
+
+/**
+ *  Mailer function
+ *
+ *  Pass email through this function to allow a way to run tests without actually sending mail
+ *  If $test is set to TRUE, progress will be displayed on screen
+ *  If $test_send is set to TRUE email will actually be sent to test email account instead of recipient
+ *
+*/
+function _views_mail_send_mail($form_values, $recipients, $view) {
+  $site_name = variable_get('site_name', '');
+  $log_type  = $form_values['log_type']  ? $form_values['log_type']   : 'watchdog';
+  $test      = variable_get('views_mail_email_test_mode', 1);
+  $test_send = variable_get('views_mail_email_test_send', 0);
+//  $test_mail = variable_get('views_mail_email_test_mail', variable_get('site_mail', $sender['mail']));
+//
+// Modification - Changed variable name as per: http://drupal.org/node/154298
+//
+  $test_mail = variable_get('views_mail_email_test_address', variable_get('site_mail', $sender['mail']));
+  if ($test) $log_type = 'screen';
+
+  if (empty($recipients)) {
+    _views_mail_error_log($log_type, t('No recipients were provided.'));
+    return;
+  }
+
+//  $subject   = $site_name           ? '['. $site_name .'] ' : '';
+//  $subject  .= $form_values['subject']   ? $form_values['subject']    : '';
+  $subject  = $form_values['subject']   ? $form_values['subject']    : '';
+  $nid  	= $form_values['newsletter']   ? $form_values['newsletter']    : '';
+  $message   = views_mail_get_node_field($nid, 'body') ? views_mail_get_node_field($nid, 'body') : '';
+  $from      = $form_values['from']      ? $form_values['from']       : variable_get('site_mail', '');
+  $from_name = $form_values['from_name'] ? $form_values['from_name']  : $site_name;
+  $sender    = theme('views_mail_email', $from, $from_name);
+  $number    = $form_values['number']      ? $form_values['number']  : 0;
+  $unit      = $form_values['unit']      ? $form_values['unit']  : 86400;
+  $node      = node_load($nid);
+
+  if (!$from) {
+    _views_mail_error_log($log_type, t('No from address was provided.'));
+    return;
+//  } elseif (!$subject) {
+//    _views_mail_error_log($log_type, t('No subject was provided.'));
+//    return;
+  } elseif (!$message) {
+    _views_mail_error_log($log_type, t('No message was provided.'));
+    return;
+  }
+
+  $results = array();
+  foreach ((array) $recipients as $to => $rec) {
+    $logged    = false;
+	$hit = "0";
+
+    if ($rec['mail']) {
+
+		// Get opt-out parameters;
+
+		$accept_mail = 'y';
+		$ooresult = db_query("SELECT uid FROM {users} where mail = '" . $rec['mail'] . "'");
+		while ($oouid = db_fetch_object($ooresult)) {
+			$account = user_load(array('uid' => $oouid->uid, 'status' => 1));
+			if (!$account->views_mail_accept) {
+				$accept_mail = 'n';
+			}
+     		if (variable_get("views_mail_force_mail_accept", 0) == 1) $accept_mail = 'y';
+		}
+
+        $optout = views_mail_check_optout($rec['mail']);
+		if ($optout) $accept_mail = 'n';
+
+        $hit .= "|A";
+        $recipient = theme('views_mail_email', $rec['mail'], $rec['name']);
+        $node->simplenews_recipient = $recipient;
+
+		if ($accept_mail == 'y') {
+
+    	  // use customized message, if provided, otherwise regular message
+	      $this_message = ($rec['message']) ? $rec['message'] : $message;
+
+    	  // Use key, if provided, otherwise create one.
+	      $key = 'views_mail:'. $view->name .':'. $rec['key'] ? $rec['key'] : $rec['mail'];
+
+    	  if (!$test || $test === FALSE) {
+		
+			$hit .= "|B";
+	
+			if ($number > 0) {
+
+				// Send mail later
+				// This is how I save the send e-mail request as an action
+
+				$params = array();
+				$params['from'] = $from; // from address
+				$params['recipient'] = $recipient; // recipient address
+				$params['subject'] = $subject; // message subject
+				$params['message'] = $message; // message
+		
+				$function = 'action_views_mail_send'; // the action function
+				$type = 'Email'; // the type of action
+				$desc = 'Views mail action  for ' . $recipient;
+			
+				// Create the action
+				// No need for watchdog entry because it is done automatically by actions_save using $desc.
+
+				$aid = actions_save($function, $type, $params, $desc);  // This will give me an $aid to use below:
+
+				// Values I need to send in order to process a sched_act_asa
+				// This is the $edit array I prepare
+
+				$edit = array();
+
+				$edit['which'] = $aid; // This is the aid (action ID)
+				$edit['a1type'] = 9; // Choose 9 just because.  Don't know how sched_act works, but it doesn't go up to 9 now.
+				$edit['a2type'] = 0;
+				$edit['a3type'] = 0;
+				$edit['a4type'] = 0;
+				$edit['terms'] = array();
+				$edit['number'] = $number; // quantity of time
+				$edit['unit'] = $unit; // seconds
+		
+				// This is the scheduling action function
+	
+				action_sched_act_asa('do', $edit);
+
+   		      	$results[] = array(t('Success'), $rec['name'], check_plain($recipient));
+       		  	$logged = true;
+
+			} else { // $number if else
+
+				// Send mail now
+	       	
+                if (views_mail_simplenews_send($node)) {
+                  $hit .= "|1";
+                  $results[] = array(t('Success'), $rec['name'], check_plain($recipient));                
+                  $logged = true;
+				}
+
+			} // end $number if
+
+      	  } else {  // if test else
+
+        	if ($test_mail && $test_send) {
+				$hit .= "|2";
+              if (views_mail_simplenews_send($node)) {
+				$hit .= "|3";
+                $results[] = array(t('Success'), $rec['name'], check_plain($recipient));                
+                $logged = true;
+	          } else {
+				$hit .= "|4";
+        	    _views_mail_error_log($log_type, t('Failure sending test to %test_mail for %mail).', array(
+            	    '%test_mail' => $test_mail, '%mail' => $recipient)));
+	            $logged = true;
+    	        $results[] = array(t('Failure!'), $rec['name'], check_plain($recipient));
+          	  } // end if
+
+	        } else { // test_mail if
+				$hit .= "|5";
+        	  _views_mail_error_log($log_type, t('Test mode! No mail sent to %test_mail for %mail.', array(
+            	'%test_mail' => $test_mail, '%name' => $rec['name'], '%mail' => $rec['mail']))            );
+	          $logged = true;
+    	      $results[] = array(t('Success'), $rec['name'], check_plain($recipient));
+        	} // end test mail if
+
+	      } // end test if
+
+	      if (!$logged) {
+				$hit .= "|6";
+        	_views_mail_error_log($log_type, t('Failure sending mail to %mail (Result: %reason) (Test: %test) (Sender: %sender) (Hit: %hit)', array(
+	            '%mail' => $recipient, '%reason' => $result, '%test' => $test, '%sender' => $sender, '%subject' => $subject, '%message' => $message, '%hit' => $hit)));
+    	  }
+
+	    } // end $accept_mail if
+
+
+	    } elseif ($rec['name']) { // rec mail elseif
+    	  _views_mail_error_log($log_type, t('Missing email address for %name (%mail) (%hit)', array('%name' => $rec['name'], '%mail' => $recipients, '%hit' => $hit)));
+	      $logged = true;
+    	  $results[] = array(t('Failure!'), $rec['name'], check_plain($recipient));
+	    }
+
+
+	} // end $rec['mail'] if
+
+  return theme('views_mail_mail_results', $results);
+}
+
+function theme_views_mail_mail_results($results) {
+  return t('<h3>Results:</h3>') . theme('table', array(t('Result'), t('Recipient'), t('Email')) , $results);
+}
+
+/**
+ *  Log messages about email progress
+ */
+function _views_mail_error_log($type, $message) {
+  switch ($type) {
+  case ('screen'):
+    drupal_set_message($message, 'error');
+    break;
+  case ('both'):
+    drupal_set_message($message, 'error');
+    watchdog('views_mail', $message);
+    break;
+  default:
+    watchdog('views_mail', $message);
+    break;
+  }
+}
+
+/**
+ *  Log mail results
+ */
+function _views_mail_log($sender, $recipient, $subject, $message) {
+  // TODO
+  // Create a database record of this transaction.
+}
+
+/**
+ *  theme for displaying hidden form values
+ */
+function theme_views_mail_form_display($name, $value) {
+  switch ($name) {
+  case ('subject'):
+    $label = t('<strong>Subject</strong>');
+    break;
+  case ('newsletter'):
+    $label = t('<strong>Newsletter</strong>');
+    break;
+  case ('message'):
+    $label = t('<strong>Message</strong>');
+    break;
+  case ('from_name'):
+    $label = t('<strong>From</strong>');
+    break;
+  case ('number'):
+    $label = t('Send after time period of:');
+    $value = ($value);
+    break;
+  case ('unit'):
+    $label = '';
+    switch($value) {
+    case (1):
+      $value = t('Seconds.');
+      break;
+    case (60):
+      $value = t('Minutes.');
+      break;
+    case (3600):
+      $value = t('Hours.');
+      break;
+    case (86400):
+      $value = t('Days.');
+      break;
+    case (weekdays):
+      $value = t('Weekdays.');
+      break;
+    }
+    break;
+  case ('to_mail'):
+    $label = t('<strong>Recipient email</strong>');
+    break;
+  case ('to_name'):
+    $label = t('<strong>Recipient name</strong>');
+    break;
+  case ('distinct'):
+    $label = t('<strong>Distinct message</strong>');
+    break;
+
+  }
+  if (!empty($label) && !empty($value)) {
+    $output =  '<dt><label>'. $label .':</label></dt>' ;
+  }
+  if (!empty($value)) {
+    $output .= '<dd>'. $value .'</dd>';
+  }
+  return $output;
+}
+
+/**
+ *  theme for mail message form
+ */
+function theme_views_mail_form($form) {
+  return '<div id="views_mail_form">'. drupal_render($form) .'</div>';
+}
+
+/**
+ * Theme an email and name into the RFC 2822 format.
+ */
+function theme_views_mail_email($email, $name) {
+  $email = trim($email);
+  $name = trim($name);
+  if ($email != $name) {
+    return $name .' <'. $email .'>';
+  }
+  else {
+    return $email;
+  }
+}
+
+/**
+ * Theme the recipient list.
+ *   If a customized message has been created for each user, there will be a third column for that.
+ */
+function theme_views_mail_recipients_list($recipients) {
+  if (sizeof(array_keys((array) $recipients) == 2)) {
+    $headers = array(t('Name'), t('Mail'));
+  } else {
+    $headers = array(t('Name'), t('Mail'), t('Message'));
+  }
+  return '<h3>Recipient List</h3>' . theme('table', $headers, $recipients);
+}
+
+/**
+ * Theme the reject list.
+ *   If a customized message has been created for each user, there will be a third column for that.
+ */
+function theme_views_mail_rejects_list($rejects) {
+  $headers = array(t('Name'), t('Mail'));
+  return '<p><h3>Reject List</h3>' . theme('table', $headers, $rejects);
+}
+
+/**
+ * Prepare a list of newsletter issues for selection.
+ */
+function views_mail_newsletters() {
+  global $user;
+  $options = array();
+  $newsletter = variable_get('views_mail_email_default_newsletter', ''); // get the newsletter term id
+
+//  $res = db_query("SELECT nid,title FROM {node} WHERE type = 'simplenews' ORDER BY title");
+
+  if (user_access('send own views mail')) {
+    $res = db_query("SELECT node.nid, node.title FROM {node} INNER JOIN {simplenews_newsletters} ON node.nid = simplenews_newsletters.nid WHERE tid = %d AND uid = %d ORDER BY node.title", $newsletter, $user->uid);
+  }
+  if (user_access('send views mail')) {
+    $res = db_query("SELECT node.nid, node.title FROM {node} INNER JOIN {simplenews_newsletters} ON node.nid = simplenews_newsletters.nid WHERE tid = %d ORDER BY node.title", $newsletter);
+  }
+  while ($view = db_fetch_object($res)) {
+    $options[$view->nid] = $view->title; 
+  }
+  
+  return $options;
+}
+
+/**
+ * Get the body of the newsletter for this nid.
+ */
+function views_mail_get_node_field($nid, $field) {
+	$output = "";
+	if (!empty($nid)) {
+		$node = node_load($nid);
+		$output = $node->$field;
+	}
+	return $output;
+}
+
+
+/**
+ * Prepare a list of newsletters for default selection.
+ */
+function views_mail_default_newsletters() {
+  $options = array();
+
+  $res = db_query("SELECT term_data.tid,term_data.name FROM {term_data} INNER JOIN {vocabulary} ON term_data.vid = vocabulary.vid WHERE vocabulary.module = 'simplenews' ORDER BY term_data.name");
+
+  while ($view = db_fetch_object($res)) {
+    $options[$view->tid] = $view->name; 
+  }
+  
+  return $options;
+}
+
+/**
+ * Implementation of a Drupal action.
+ * This is an example action. Actions should live in the modules
+ * for which the actions apply. For example, node actions should
+ * be exposed by node.module.
+ *
+ */
+function action_views_mail_send($op, $edit = array(), $node) {
+  switch($op) {
+    case 'metadata':
+      return array(
+        'description' => t('Send Views Mail'),
+        'type' => t('Email'),
+        'batchable' => false,
+        'configurable' => true,
+      );
+
+    case 'do':
+      // note this is the user who owns the node, not global $user
+      $user = user_load(array('uid' => $node->uid));
+      $site_name = variable_get('site_name', 'Drupal');
+      $site_mail = variable_get('site_mail', ini_get('sendmail_from'));
+      $from = $edit['from'];
+      $subject = $edit['subject'];
+      $message = $edit['message'];
+      if ($edit['recipient'] == t('%author')) {
+        $recipient = $user->mail;
+      } else {
+        $recipient = $edit['recipient'];
+      }
+      $node->simplenews_recipient = $recipient;
+      $subject = $node->title;
+      if (isset($node) && is_object($node)) {
+        $variables = array(
+          '%site_name' => $site_name,
+          '%site_mail' => $site_mail,
+          '%username' => $user->name,
+          '%uid' => $node->uid,
+          '%node_url' => url('node/' . $node->nid, NULL, NULL, TRUE),
+          '%node_type' => $node->type,
+          '%title' => $node->title,
+          '%teaser' => strip_tags($node->teaser),
+          '%body' => strip_tags($node->body)
+           );
+
+        $subject = strtr($subject, $variables);
+        $subject = str_replace(array("\r", "\n"), '', $subject);
+        $message = strtr($message, $variables);
+      }
+      if (views_mail_simplenews_send($node)) {
+        watchdog('action', t('Sent email to %recipient', array('%recipient' => $recipient)));
+      }
+      else {
+        watchdog('error', t('Unable to send email to %recipient', array('%recipient' => $recipient)));
+      }
+      break;
+
+    // return an HTML config form for the action
+    case 'form':
+      // default values for form
+      if (!isset($edit['recipient'])) $edit['recipient'] = '';
+      if (!isset($edit['subject'])) $edit['subject'] = '';
+      if (!isset($edit['message'])) $edit['message'] = '';
+      $form = array();
+
+      // add form components
+      $form['from'] = array(
+        '#type' => 'textfield',
+        '#title' => t('From'),
+        '#default_value' => $edit['from'],
+        '#size' => '20',
+        '#maxlength' => '254',
+        '#description' => t('The email address of the sender.'),
+      );
+      $form['recipient'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Recipient'),
+        '#default_value' => $edit['recipient'],
+        '#size' => '20',
+        '#maxlength' => '254',
+        '#description' => t('The email address to which the message should be sent OR enter %author if you would like to send an e-mail to the original author of the post.', array('%author' => theme('placeholder', t('%author')))),
+      );
+      $form['subject'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Subject'),
+        '#default_value' => $edit['subject'],
+        '#size' => '20',
+        '#maxlength' => '254',
+        '#description' => t('The subject of the message.'),
+      );
+      $form['message'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Message'),
+        '#default_value' => $edit['message'],
+        '#cols' => '80',
+        '#rows' => '20',
+        '#description' => t('The message that should be sent. It can be in HTML format. You may include the following variables: %site_name, %username, %node_url, %node_type, %title, %teaser, %body'),
+      );
+      return $form;
+
+     // validate the HTML form
+    case 'validate':
+      $errors = array();
+
+      if (!valid_email_address($edit['from']) && $edit['from'] != t('%site_mail')) {
+        $errors['from'] = t('Please enter a valid email address or %site_mail.', array('%site_mail' => theme('placeholder', t('%site_mail'))));
+      }
+      if (!valid_email_address($edit['recipient']) && $edit['recipient'] != t('%author')) {
+        $errors['recipient'] = t('Please enter a valid email address or %author.', array('%author' => theme('placeholder', t('%author'))));
+      }
+      foreach ($errors as $name => $message) {
+        form_set_error($name, $message);
+      }
+
+      return count($errors) == 0;
+
+    // process the HTML form to store configuration
+    case 'submit':
+      $params = array(
+        'from' => $edit['from'],
+        'recipient' => $edit['recipient'],
+        'subject'   => $edit['subject'],
+        'message'   => $edit['message']);
+      return $params;
+  }
+}
+
+/**
+ * Implementation of hook_cron().
+ * This is used to delete the scheduled actions created by this module after they have been executed.
+ */
+function views_mail_cron() {
+  $clear_cache = FALSE;
+
+  // First, delete the actions themselves;
+    
+  $acts = db_query("SELECT aid FROM {sched_act} WHERE sched < %d AND actual > 0 AND a1type = 9", time());
+  while ($act = db_fetch_object($acts)) {
+    db_query("DELETE FROM {actions} WHERE aid = %d AND func = 'action_views_mail_send' ", $act->aid); // delete this action;
+    $clear_cache = TRUE;
+  }
+  
+  // Second, delete the schedules;
+    
+  $acts = db_query("DELETE FROM {sched_act} WHERE sched < %d AND actual > 0 AND a1type = 9", time());
+
+  if ($clear_cache) {
+    // clear the cache so an anonymous poster can see any changes
+    cache_clear_all();
+  }
+}
+
+/**
+ * implementation of hook_og();
+ *
+ * @param $op string, 'user insert', 'user update', 'user delete'
+ * @param $nid node ID of the group 
+ * @param $uid the user ID
+ * @param $args associative array containing details about the subscription
+ */
+function views_mail_og($op, $nid, $uid, $args = array()) {
+    switch ($op) {
+      case 'user insert':
+		
+		global $base_url;
+		$user = user_load(array('uid' => $uid));
+		$username = $user->name;
+		$node = node_load($nid);
+
+		// Subscribe this user to the newsletter if this group is in the subscribe_newsletter list
+
+		$str = variable_get("views_mail_subscribe_group_newsletter", '');
+
+		if (!empty($str)) {
+
+			$array = preg_split('/[\n\r]+/', $str, -1, PREG_SPLIT_NO_EMPTY); // split into an array
+
+			foreach ($array as $arrayItem) {
+				$groupArray = preg_split('/\|/', $arrayItem, -1, PREG_SPLIT_NO_EMPTY); // split at the | = group|newsletter
+				$gid = $groupArray[0];
+				$newsletter = $groupArray[1];
+				if ($gid == $nid) { // if this group ID matches the one stored, then subscribe this user to newsletter
+					simplenews_subscribe_user($user->mail, $newsletter, $confirm = FALSE);					
+				} // end if
+					
+			} // end foreach
+
+		} // end if
+
+
+       	break;
+    }
+}
+
+
+
+/**
+ * @ingroup views
+ */
+
+/**
+ * Implementation of hook_views_tables():
+ * Present fields and filters for user data.
+ * Requires that usernode be installed.
+ */
+
+function views_mail_views_tables() {
+
+
+  $tables['views_mail_users_uid'] = array(
+    'name' => 'og_uid',
+    'provider' => 'internal', // won't show up in external list.
+    'join' => array(
+      'left' => array(
+        'table' => 'node',
+        'field' => 'uid'
+      ),
+      'right' => array(
+        'field' => 'uid'
+      ),
+    ),
+    'filters' => array(
+      'nid' => array(
+        'name' => t('Views Mail: Group (using og_uid)'),
+        'list' => 'views_handler_filter_views_mail_group',
+        'list-type' => 'list',
+        'operator' => 'views_handler_operator_or',
+        'value-type' => 'array',
+        'help' => t('Include or exclude nodes whose node author belongs to the selected groups - using og_uid table.'),
+      ),
+    ),
+  );
+
+  $tables['views_mail_roles'] = array(
+    'name' => 'users_roles',
+    'provider' => 'internal', // won't show up in external list.
+    'join' => array(
+      'left' => array(
+        'table' => 'node',
+        'field' => 'uid'
+      ),
+      'right' => array(
+        'field' => 'uid'
+      ),
+    ),
+    'filters' => array(
+      'rid' => array(
+        'name' => t('Views Mail: Role (non-group)'),
+        'operator' => 'views_handler_operator_andor',
+        'list' => 'views_handler_filter_role',
+        'value-type' => 'array',
+        'help' => t('Include the node only if the node author is a member of the selected role - uses users_roles (non-group roles).'),
+      ),
+    ),
+  );
+
+  $tables['views_mail_optout'] = array(
+    'name' => 'views_mail_optout',
+    'provider' => 'internal', // won't show up in external list.
+    'join' => array(
+      'type' => 'inner',
+      'left' => array(
+        'table' => 'node',
+        'field' => 'nid'
+      ),
+      'right' => array(
+        'field' => 'nid'
+      ),
+    ),
+    'fields' => array(
+      'email' => array(
+        'name' => t('Views Mail Opt-Out: Email'),
+        'sortable' => true,
+        'help' => t('Email address of opted out user.'),
+      ),
+      'nid' => array(
+        'name' => t('Views Mail Opt-Out: Node ID'),
+        'sortable' => true,
+        'handler' => 'views_handler_node_nid',
+        'help' => t('Node ID of Views Mail newsletter from which this user opted out.'),
+      ),
+      'view' => array(
+        'name' => t('Views Mail Opt-Out: View link'),
+        'handler' => 'views_handler_node_view',
+        'notafield' => TRUE,
+        'option' => 'string',
+        'help' => t('Display a link to view the node. Enter the text of this link into the option field; if blank the default "View" will be used.'),
+      ),
+    ),
+    
+  );
+
+  return $tables;
+}
+
+/**
+ * Implementation of hook_views_default_views():
+ * Present fields and filters for user data.
+ * Requires that usernode be installed.
+ */
+
+function views_mail_views_default_views() {
+  $view = new stdClass();
+  $view->name = 'ViewsMailOptOut';
+  $view->description = 'Users who have opted out of Views Mail';
+//  $view->access = array (0 => '6',);
+  $view->view_args_php = '';
+  $view->page = TRUE;
+  $view->page_title = 'Views Mail Opt Out';
+  $view->page_header = '';
+  $view->page_header_format = '3';
+  $view->page_footer = '';
+  $view->page_footer_format = '3';
+  $view->page_empty = '';
+  $view->page_empty_format = '3';
+  $view->page_type = 'table';
+  $view->url = 'view/views_mail_optout';
+  $view->use_pager = TRUE;
+  $view->nodes_per_page = '10';
+  $view->sort = array (
+  );
+  $view->argument = array (
+  );
+  $view->field = array (
+    array (
+      'tablename' => 'views_mail_optout',
+      'field' => 'email',
+      'label' => 'Email',
+      'sortable' => '1',
+    ),
+    array (
+      'tablename' => 'views_mail_optout',
+      'field' => 'nid',
+      'label' => 'Node ID',
+      'sortable' => '1',
+    ),
+    array (
+      'tablename' => 'views_mail_optout',
+      'field' => 'view',
+      'label' => '',
+    ),
+  );
+  $view->filter = array (
+  );
+  $view->exposed_filter = array (
+  );
+  $view->requires = array(views_mail_optout);
+  
+  // See http://drupal.org/node/99568
+  $view->disabled = TRUE;
+  
+  $views[$view->name] = $view;
+
+  return $views;
+}
+
+/*
+ * Create a list of group names and IDs.
+ */
+function views_handler_filter_views_mail_group() {
+  $list = array();
+  $list = variable_get('og_node_types', array('og'));  
+  $groupTypes = implode(",", $list);
+  $vids = array();
+  $result = db_query("SELECT n.nid, n.title FROM {node} n WHERE n.type IN ('". $groupTypes ."') ORDER BY n.title");
+  while ($obj = db_fetch_object($result)) {
+    $vids[$obj->nid] = $obj->title;
+  }
+  return $vids;
+}
+
+/**
+* Send a Simplenews newsletter
+* Note that the $to email address is sent as 
+*
+* @param $input
+*   The node object of the newsletter to send.
+*   (include recipient address as $input->simplenews_recipient)
+* 
+* @return 
+*   Return TRUE if email is sent.
+*/
+function views_mail_simplenews_send($input) {
+  $tid = db_result(db_query('SELECT tid FROM {simplenews_newsletters} WHERE nid = %d', $input->nid));
+  $tid = $tid ? $tid : FALSE;
+  $node = simplenews_node_prepare($input->nid, NULL, $tid);
+  $term = $tid ? taxonomy_get_term($tid) : FALSE;
+  $name = $term ? $term->name : 'Unassigned newsletter';
+  $to = $input->simplenews_recipient;
+  $node->to = $to;
+  // Unformat subject line if settings require.
+  if (variable_get('views_mail_format_subject', 1) == 0) {
+    $node->subject = $node->title;
+  } 
+  
+  // Get email address only.
+    $pattern = '/.+\<(.+)\>/i';
+    $replacement = '${1}';
+    $mail = preg_replace($pattern, $replacement, $to);
+
+  // Check opt out table
+    $optout = views_mail_check_optout($mail);
+
+  // Add themable footer to message as this changes per user.
+    $hash = _views_mail_generate_hash($mail, $node->nid);
+    $user_node = drupal_clone($node);
+    $user_node = theme('views_mail_newsletter_footer', $user_node, $hash);
+
+  if (simplenews_mail_send($user_node) && $optout === FALSE) {
+    drupal_set_message(t('Newsletter sent to %recipient.', array('%recipient' => $to)));
+    watchdog('views_mail', t('Sent newsletter to %recipient', array('%recipient' => $to)));
+    return TRUE;
+  } else {
+    drupal_set_message(t('Newsletter NOT sent to %recipient.', array('%recipient' => $to)));
+    watchdog('views_mail', t('Did NOT send newsletter to %recipient', array('%recipient' => $to)));
+  }
+}
+/**
+ * Implementation of hook_link().
+ */
+function views_mail_link($type, $node = NULL, $teaser = FALSE) {
+  $links = array();
+  // If this is a newsletter node in the Views Mail newsletter group
+  // and views_mail_link is clicked on 
+  if ($type == 'node' && $node->type == 'simplenews') {
+    $count = db_result(db_query('SELECT COUNT(nid) FROM {simplenews_newsletters} WHERE nid = %d AND tid = %d', $node->nid, variable_get('views_mail_email_default_newsletter', 0)));
+	if ($count > 0 && variable_get('views_mail_link', 0) == 1) {
+	  // If this is a group node, process for group, otherwise, normal process
+      if (count($node->og_groups) && $group_node = node_load($node->og_groups[0])) { 
+        if (user_access('send views mail') || user_access('send own views mail')) {
+          $links['views_mail_newsletter'] = array(
+            'title' => t(variable_get('views_mail_link_title', '')),
+            'href' => variable_get('views_mail_link_url', '') . '/' . $group_node->nid,
+          );
+        }
+      } else {
+        $links['views_mail_newsletter'] = array(
+          'title' => t(variable_get('views_mail_link_title', '')),
+          'href' => variable_get('views_mail_link_url', ''),
+        );
+	  }
+    } // end views_mail_link if
+  } // end simplenews node if
+
+  return $links;
+}
+
+/**
+ * Theme the footer.
+ */
+function theme_views_mail_newsletter_footer($node, $hash) {
+
+  if ($node->s_format == 'html') {
+    $node->body .= '<p>-- <br />'. l(t('Click here to unsubscribe from this newsletter'), 'views_mail/confirm/remove/'. $hash, array(), NULL, NULL, TRUE) .'</p>';
+  }
+  else {
+    $node->body .= "\n\n-- \n". t('Unsubscribe from this newsletter: @url', array('@url' => url('views_mail/confirm/remove/'. $hash, NULL, NULL, TRUE)));
+  }
+  return $node;
+}
+
+/**
+ * Helper function to generate the hash key used for subscribe/unsubscribe link
+ * in e-mail footer.
+ */
+function _views_mail_generate_hash($mail, $nid) {
+  return drupal_substr(md5($mail . views_mail_private_key()), 0, 10) . $nid .'t'. $mail;
+}
+
+function views_mail_private_key() {
+  $key = variable_get('views_mail_private_key', FALSE);
+  if (!$key) {
+    //  This will create a 32 character identifier (a 128 bit hex number) that is extremely difficult to predict
+    $key = md5(uniqid(rand()));
+    variable_set('views_mail_private_key', $key);
+  }
+  return $key;
+}
+
+/**
+ * Menu callback; confirm the user's unsubscription request when they click
+ * on the confirm link in the e-mail footer.
+ */
+function views_mail_confirm_subscription($op1 = NULL, $op2 = NULL) {
+  $md5 = drupal_substr($op2, 0, 10);
+  list($nid, $mail) = explode('t', drupal_substr($op2, 10));
+
+  $result = db_query('SELECT nid FROM {node} WHERE nid = %d', $nid);
+  if (!($newsletter = db_fetch_object($result))) {
+    drupal_not_found();
+    return;
+  }
+
+  // If this user has already been placed on optout list, ignore
+  $optout = views_mail_check_optout($mail);
+  if ($optout) {
+    drupal_set_message(t('Email : ') . $mail . t(' already unsubscribed from Views Mail.'));
+    drupal_not_found();
+    return;
+  }
+
+
+  if ($md5 == drupal_substr(md5($mail . views_mail_private_key()), 0, 10)) {
+    if ($op1 == 'remove') {
+      return drupal_get_form('views_mail_confirm_removal_form', $mail, $nid);
+    }
+  }
+
+  // If md5 didn't match, do a not found.
+  drupal_not_found();
+  return;
+}
+
+/**
+ * Generate the confirm remove form.
+ */
+function views_mail_confirm_removal_form($mail, $nid) {
+  $form = array();
+  $form['question'] = array('#value' => '<p>'. t('Are you sure you want to remove %user from the Views Mail subscription list?', array('%user' => $mail)) ."<p>\n");
+  $form['mail'] = array('#type' => 'value', '#value' => $mail);
+  $form['nid'] = array('#type' => 'value', '#value' => $nid);
+
+  return confirm_form($form,
+    t('Confirm unsubscription'),
+    '',
+    t('This action will only remove you from the Views Mail subscription list. If you are registered at our site, your account information will remain unchanged.'),
+    t('Unsubscribe'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Forms API callback; handles form submission for a user confirming unsubscribe
+ * request.
+ */
+function views_mail_confirm_removal_form_submit($form_id, $form_values) {
+  views_mail_unsubscribe_user($form_values['mail'], $form_values['nid'], FALSE);
+  drupal_set_message(t('%user was successfully removed from the Views Mail subscription list.', array('%user' => $form_values['mail'])));
+  return '';
+}
+
+/**
+ * API function; unsubscribes a user from Views Mail.
+ *
+ * @param $mail
+ *   The e-mail address to unsubscribe.
+ * @param $nid
+ *   The nodeID of the newsletter where the user clicked on unsubscribe.
+ * @param $confirm
+ *   Whether we should send a confirmation e-mail and hold off removing this
+ *   user from the newsletter until he clicks the confirm link in the e-mail.
+ */
+function views_mail_unsubscribe_user($mail, $nid, $confirm = TRUE) {
+  //Prevent mismatches from accidental capitals in mail address
+  $mail = strtolower($mail);
+
+  db_query("INSERT INTO {views_mail_optout} (email, nid) VALUES ('%s', %d)", $mail, $nid);
+
+  return TRUE;
+}
+
+/**
+ * API function; checks to see if user is in opt out table.
+ *
+ * @param $mail
+ *   The e-mail address to unsubscribe.
+ *
+ * @return 
+ *   Return TRUE if email found.
+ *
+ */
+function views_mail_check_optout($mail_in) {
+  // Get email address only.
+    $pattern = '/.+\<(.+)\>/i';
+    $replacement = '${1}';
+    $mail = preg_replace($pattern, $replacement, $mail_in);
+
+  // Prevent mismatches from accidental capitals in mail address
+    $mail = strtolower($mail);
+
+  $count = db_result(db_query("SELECT COUNT(email) FROM {views_mail_optout} WHERE email = '%s'", $mail));
+
+  if ($count == 0) {
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+}
+
+?>

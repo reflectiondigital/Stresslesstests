@@ -1,0 +1,527 @@
+<?php
+
+
+//if (module_exists('date')) {
+  //include_once('./'. drupal_get_path('module', 'date') .'/date.inc');
+ // include_once(drupal_get_path('module', 'date_api') .'/date.inc');
+
+//}
+
+
+function roster_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      // This description is shown in the listing at admin/modules.
+      return t('The roster module handles the viewing of the class roster');
+  }
+}
+
+
+
+/**
+ * Implementation of hook_node_info
+ */
+function roster_node_info () {
+  return array(
+    'survey' => array(
+      'name' => t('roster'),
+      'module' => 'roster',
+      'description' => t("The roster module handles the viewing of the class roster.")));
+}
+
+
+
+/**
+* Implementation of hook_perm().
+*
+*/
+function roster_perm() {
+  return array('access roster');
+}
+
+
+/**
+* Implementation of hook_menu().
+*
+*/
+function roster_menu($may_cache) {
+  $items = array();
+
+    $access = user_access('access roster');
+    
+    $items[] = array(
+      'path' => 'admin/view/roster',
+      'title' => t('Class Roster'),
+      'description' => t('View the class roster'),
+      'callback' => 'roster_admin',
+      'access' => user_access('access roster'),
+      'weight' => -10,
+      'type' => MENU_NORMAL_ITEM,
+    );
+  
+   /* $items[] = array(
+      'path' => 'admin/roster/mail',
+      'title' => t('Email registrants'),
+      'callback' => 'roster_show_emailform',
+      'callback_arguments' => array($mailnames, $mailemails),
+      'access' => user_access('access roster'),
+    );
+    */
+     
+    return $items;
+}
+
+
+/**
+* Must build as a form in order to submit.  However, the  Word .doc export needs it in the form of a table.  See roster_build_table.
+*
+*/
+function roster_build_form() {
+    
+	/*if ($_POST['submit']){
+		 return confirm_form('roster_email', t('Email the registrants'), 'admin/view/roster', t('Click to send'), t('Email users'), t('Cancel'));
+	}*/
+	
+	if (arg(3) == 'sort' && !is_null(arg(3))) {
+		$sortby = ' AND r.field_section_value = ' . arg(4);
+		$cap = true; //add caption
+	} else {
+		$sortby = '';
+		$cap = false;
+	}
+	
+	$result = pager_query('SELECT r.field_email_value, n.field_names_value, r.field_phone_value, r.field_grade_value, r.field_school_value, r.field_status_value, r.nid, r.field_section_value, nd.created, t.field_model_value, t.field_location_nid, l.field_room_value, nr.title AS loctitle FROM {content_type_register} r LEFT JOIN {content_field_names} n ON r.nid = n.nid LEFT JOIN {node} nd ON r.nid = nd.nid LEFT JOIN {content_type_class} t ON r.field_section_value = t.nid  LEFT JOIN content_type_location l ON t.field_location_nid  = l.nid LEFT JOIN node_revisions nr ON l.nid = nr.nid WHERE t.field_dates_value > NOW()'. $sortby .' ORDER BY nd.created DESC', 30, 0, NULL);
+
+
+	/*$rosterform['submit'] = array( 
+    '#type' => 'submit',
+    '#value' => 'Email Selected Registrants'
+  );*/
+
+
+	$destination = drupal_get_destination();
+	
+	while ($classlist = db_fetch_object($result)){
+		/*$classttl =  $classlist->title;
+   
+   		if ($cap){
+			$rostercaption = "<h3>".$classttl."</h3>";
+		} else {
+			$rostercaption = "";
+		}*/
+		
+		
+		//$classname =   mysql_fetch_array(db_query("SELECT n.title, DATE_FORMAT(t.field_dates_value, '%h:%i') AS time FROM node n LEFT JOIN content_type_class t ON t.field_class_nid = n.nid WHERE t.nid = ".$classlist->field_section_value." LIMIT 1"));
+		$classname =   mysql_fetch_array(db_query("SELECT n.title, t.field_class_nid, t.field_dates_value AS time FROM node n LEFT JOIN content_type_class t ON t.field_class_nid = n.nid WHERE t.nid = ".$classlist->field_section_value));
+	
+	$classttl = mysql_fetch_array(db_query("SELECT title FROM node WHERE nid = " . $classlist->field_section_value));	
+		/*echo date_show_value($classname['time']) . XXX;
+		
+		print date_show_date($classname['time'], 'm/d/Y H:i', 'local', '');
+		print content_format('mydate', $classname['time'], 'short' );
+		
+		$date_as_date_object = date_make_date();
+		date_set_date($date_as_date_object, $classname['time'], 'US/Eastern', 'local', DATE_ISO);
+		print date_show_date($date_as_date_object, 'date_format_short', 'local');*/
+	
+	 //$date = date_make_date();
+	 //date_set_date($date, $classname['time']);
+	 // print date_show_date($classname['time'], 'm/d/Y H:i', 'local', '+28800');
+	 
+	
+	 $eventtime = strtotime($classname['time']);
+
+	$eventtime = $eventtime - 21600; //? change for DST/EST?
+	$eventtime = date('g:ia', $eventtime);
+	
+	if($classlist->field_room_value){
+		$room = " in room " . $classlist->field_room_value . ".  Signs will be posted on the front door if there is a change in the room number.";
+	} else {
+	 	$room = ".";
+	}
+	
+	
+	if( $classname['field_class_nid'] == 13){//13 is the parent class id
+			
+		
+				$supplies = "Please bring some materials for taking notes, such as a legal pad or notebook, and a pen. I am looking forward to seeing you there.";
+			
+			} else { //Student class
+			$supplies = "Students may bring a cold beverage and snack to enjoy during the break.\n\n
+
+In addition, please be sure your student brings the needed supplies, including:\n\n
+
+- a one inch three ring binder with a transparent cover for an insert,\n
+- notebook paper,\n
+- a pen to take notes,\n
+- Avery dividers with eight (8) pre-numbered tabs and a front Table of Contents (paper, not plastic) that matches the tabs,\n
+- a highlighter.\n\n";
+		}
+			
+			
+			$emailText = "Hello,\n\nThank you for your registration for ".$classttl['title'] ." at $eventtime. We will meet at $classlist->loctitle".$room."  If you need directions to the school, you may wish to refer to the Class Locations section on my web site.\n\n  ".$supplies ."\n\n
+			
+\n
+Thanks,\n
+Betty\n\n
+
+Betty A. Caldwell, M.A.\n
+Director, Stressless Tests™\n
+410-740-4659\n
+www.Stresslesstests.org";
+		
+		$users[$classlist->nid] = '';
+		
+		$rosterform['name'][$classlist->nid] = array('#value' => l($classlist->field_names_value, 'node/'.$classlist->nid.'/edit'));
+		$rosterform['phone'][$classlist->nid] = array('#value'=> $classlist->field_phone_value);
+		$rosterform['grade'][$classlist->nid] = array('#value'=> $classlist->field_grade_value);
+		$rosterform['school'][$classlist->nid] = array('#value'=> $classlist->field_school_value);
+		$rosterform['section'][$classlist->nid] = array('#value'=> $classlist->field_model_value);
+		$rosterform['created'][$classlist->nid] = array('#value'=> $classlist->created);
+		$rosterform['status'][$classlist->nid] = array('#value'=> $classlist->field_status_value);
+	}
+	$rosterform['users'] = array('#type' => 'checkboxes', '#options' => $users, '#required' => TRUE, '#title' => t('Attendees'),'#prefix' => '<span style="visibility: hidden;">',
+  '#suffix' => '</span>', );
+
+	$rosterform['caption'] = array('#type' => 'value','#value' => $rostercaption);
+	
+	 
+ 	
+	//We don't want to display the form unless the form has been sorted, or else the values won't be right!
+	if ($cap){
+	
+		 $rosterform['intro'] = array(
+	  '#value' => '<h3>Check the names above to send an email confirmation message to attendees.</h3>',
+    );
+	
+	  $rosterform['subject'] = array(
+      '#type' => 'hidden', 
+      '#title' => t('Subject'),
+	  '#value' => 'Stressless Tests Supplies Needed',
+      '#required' => TRUE,
+    );
+	
+		 $rosterform['body'] = array(
+		  '#type' => 'textarea', 
+		  '#title' => t('Mail body'),
+		   '#value' => $emailText,
+		   '#disabled' => TRUE,
+		  '#required' => TRUE,
+		);
+		
+		
+		 $rosterform['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Send Email'),
+		);
+	
+	}
+	
+	//$rosterform['#submit'] = array('roster_build_form_process' => array());
+	
+	return $rosterform;
+	
+	/*$output .= drupal_get_form('roster_build_form', $rosterform);
+  
+ 	 return $output;*/
+}
+
+
+/**
+ * Theme node administration overview.
+ */
+function theme_roster_build_form($form) {
+
+  // Overview table:
+  $header = array(theme('table_select_header_cell'), t('Name'), t('Phone'), t('Grade'), t('School'), t('Section'), t('Date'),  t('Status'));
+
+  if (isset($form['name']) && is_array($form['name'])) {
+    foreach (element_children($form['name']) as $key) {
+      $row = array();
+      $row[] = drupal_render($form['users'][$key]);
+      $row[] = drupal_render($form['name'][$key]);
+      $row[] = drupal_render($form['phone'][$key]);
+      $row[] = drupal_render($form['grade'][$key]);
+      $row[] = drupal_render($form['school'][$key]);
+      $row[] = drupal_render($form['section'][$key]);
+	  $row[] = format_date(drupal_render($form['created'][$key]), 'small');
+	  //$row[] = drupal_render($form['created'][$key]);
+      $row[] = drupal_render($form['status'][$key]);
+      $rows[] = $row;
+    }
+
+  }
+  else  {
+    $rows[] = array(array('data' => t('No registrations available.'), 'colspan' => '7'));
+  }
+
+  $output .= theme('table', $header, $rows, array('width' => '100%'), $form['caption']['#value']);
+
+  
+  if ($form['pager']['#value']) {
+    $output .= drupal_render($form['pager']);
+  }
+
+  $output .= drupal_render($form);
+
+  return $output;
+}
+
+
+/**
+ * Validates form fields before sending
+ */
+
+function roster_build_form_validate($form_id, $form_values){
+	/*if ($form_values['users']) == 0{
+		form_set_error('users', t('You must select someone to email using the checkboxes!'));
+	}*/
+	
+	if ($form_values['subject'] == ''){
+		form_set_error('subject', t('Subject is required!'));
+	}
+	
+	if ($form_values['body'] == ''){
+		form_set_error('body', t('You cannot send a blank message!'));
+	}
+
+}
+
+
+/**
+ *
+ *
+ * Sends email to students
+ *
+ *
+ */
+
+function roster_build_form_submit($form_id, $form_values){
+	
+	foreach ($form_values['users'] as $id){
+	  if($id > 0){
+		$result = db_query("SELECT r.field_email_value, n.field_names_value, n.nid FROM content_type_register r LEFT JOIN content_field_names n ON r.nid = n.nid  WHERE r.nid = ".$id);
+		$emailArray = db_fetch_object($result);
+		
+		$from = variable_get('site_mail', ini_get('sendmail_from'));
+					
+		$header = array(
+			'Return-Path' => "<$from>",
+			'Date' => date('r'),
+			'From' => "Stressless Tests<$from>",
+			'Reply-to' => "Betty Caldwell <betty@stresslesstests.org>",
+			'X-Mailer' => 'Drupal',
+			'X-Priority' => '1'
+		  );	
+		
+			
+		$to = $emailArray->field_email_value . ', Bcaldwell@comcast.net';
+		$customName = $emailArray->field_names_value;
+		
+		$trans = array(
+          '%username' => $customName,
+        );
+		
+	    $message = strtr($form_values['body'], $trans);
+		
+		drupal_mail('roster_confirmation_mail', $to, $form_values['subject'], $message, $from, $header);
+       
+	    $query2 ="UPDATE content_type_register SET field_status_value = 'emailed' WHERE nid = ". $id;
+	    db_query($query2);
+	   
+	    watchdog('roster', t('Confirmation for class sent to %useremail.', array('%useremail' => $to)), WATCHDOG_NOTICE, l(t('view'), 'node/'. $emailArray->nid));
+	  }
+
+	}
+	
+	drupal_set_message(t('<h2>The users have been mailed.</h2>'));
+}
+
+
+
+/**
+ * Display the main class roster, all student registrations in the future
+ */
+function roster_admin() {
+   $output = '<table cellpadding="1" width="100%"><tbody style="border-top: 0px;"><tr><td>'. drupal_get_form('roster_sort_form') .'</td><td align="right">'.drupal_get_form('roster_export_form').'<br /><em>(Exporting may take a few moments)</em></td></tr></tbody></table>';
+	
+	//$output .= $thetable;
+	$output .= drupal_get_form('roster_build_form');
+  
+ $output .= theme('pager', NULL, variable_get('uc_order_number_displayed', 30), 0);
+  return $output;
+}
+
+
+
+function roster_sort_form() {
+	$sessions = array();
+	$sessions = roster_session_list();
+
+	  
+  if (!is_null(arg(4))) {
+		$default_session = arg(4);
+		$class_descrip =   mysql_fetch_array(db_query("SELECT n.title FROM node n WHERE n.nid = ".$default_session." LIMIT 1"));
+		
+	} else {
+		$default_session = 0;
+	}
+	
+  $form['section'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('View by Class'),
+  );	
+	
+  $form['section']['session'] = array(
+    '#type' => 'select',
+    '#options' => $sessions,
+    '#default_value' => $default_session,
+    '#attributes' => array('onchange' => 'this.form.submit();')
+  );
+
+  $form['section']['submit'] = array( 
+    '#type' => 'submit',
+    '#value' => 'View',
+    '#attributes' => array('id' => 'sort-form-submit'),
+    '#prefix' => '<span style="display: none;">',
+    '#suffix' => '</span>'
+  );
+  
+  //Show Class title above table
+  $form['class_descrip'] = array(
+	'#value' => "<h3>" .$class_descrip['title'] . "</h3>"
+  );
+
+  return $form;
+}
+
+
+function roster_sort_form_submit($form_id, $form_values) {
+  if ($form_values['session'] == '0') {
+    drupal_goto('admin/view/roster');
+  }
+  else {
+    drupal_goto('admin/view/roster/sort/'. $form_values['session']);
+  }
+}
+
+function roster_export_form() { 
+ $form1['submit'] = array( 
+    '#type' => 'submit',
+    '#value' => 'Export to Word .doc'
+  );
+
+  return $form1;
+}
+
+
+/**
+ *  Main Function to export a view as DOC
+ */
+ //http://drupal.org/node/185306
+function roster_export_form_submit() {
+  drupal_set_header('Content-Type: application/msword');
+	drupal_set_header('Content-Disposition: attachment; filename="Roster.doc"');
+ 
+	 $output = '<html>';
+	 $output .= '<head><meta http-equiv=Content-Type content="text/html; charset=utf-8"></head>';
+	 $output .= '<body>';
+	  
+	  $table = roster_build_table();
+	 // $table = "THIS IS A TEST";
+	  
+	  $output .= preg_replace('/<\/?(a|span) ?.*?>/', '', $table); //strip 'a' and 'span' tags*/
+	  
+	  $output .= "</body></html>";
+	 
+	// print $output;
+	 
+	 print $output;
+	 
+	 module_invoke_all('exit');
+	  exit;
+}
+
+function roster_session_list() {
+	//Get all scheduled sessions
+ 	$result = db_query("SELECT p.nid, p.field_model_value, n.title AS class, p.field_dates_value FROM {content_type_class} p LEFT JOIN {node} n ON p.field_class_nid = n.nid WHERE p.field_dates_value > NOW() ORDER BY p.field_dates_value ASC");
+ 	
+ 	$options[0] = "All";
+ 	
+ 	while ($o = db_fetch_object($result)) {
+ 		//display meaningful info in dropdown filter
+ 	 	$thedate = substr($o->field_dates_value,5,5);
+ 	 	$thedate = str_replace('-', '/', $thedate);
+ 		$displayname = substr($o->class, 0,4).": ". $thedate; 
+		$options[$o->nid] = $displayname;
+	}
+ 	return $options;
+}
+
+
+
+
+function roster_build_table(){ //For WORD export
+	
+	$rosterheader = array(
+	theme('table_select_header_cell'),
+    array('data' => t('Names')),
+    array('data' => t('Phone')),
+    array('data' => t('Grade')),
+    array('data' => t('School')),
+    array('data' => t('Status')),
+	  array('data' => t('1')),
+	    array('data' => t('2')),
+		  array('data' => t('3')),
+		    array('data' => t('4')),
+  );
+  
+
+   		if (arg(3) == 'sort' && !is_null(arg(3))) {
+    		$sortby = ' AND r.field_section_value = ' . arg(4);
+    		$cap = true; //add caption
+    	} else {
+    		$sortby = '';
+    		$cap = false;
+    	}
+ 
+  //structure C
+ $sql = 'SELECT n.field_names_value, r.field_phone_value, r.field_grade_value, r.field_school_value, r.field_status_value, r.nid, r.field_section_value, t.field_model_value, nd.created FROM {content_type_register} r LEFT JOIN {content_field_names} n ON r.nid = n.nid LEFT JOIN {node} nd ON r.nid = nd.nid LEFT JOIN {content_type_class} t ON r.field_section_value = t.nid  WHERE t.field_dates_value > NOW() '. $sortby . ' ORDER BY nd.created DESC';
+ 
+ 
+
+ 
+ // $result = pager_query($sql, 30);
+ $result = db_query($sql);
+ 
+ 
+   while ($classlist = db_fetch_object($result)) {
+    
+    $rosterrows[] = array(
+      'data' => array(
+        array('data' => $classlist->nid), //can remove this
+        l($classlist->field_names_value, 'node/'.$classlist->nid.'/edit'),
+        array('data' => $classlist->field_phone_value),
+        array('data' => $classlist->field_grade_value),
+        array('data' => $classlist->field_school_value),
+       array('data' => $classlist->field_status_value)),
+	);
+    
+	 // $classttl =  $classlist->title;
+ }//endwhile
+ 
+ 
+ //Get classname
+ $classname =   mysql_fetch_array(db_query("SELECT n.title FROM node n LEFT JOIN content_type_class t ON t.field_class_nid = n.nid WHERE t.nid = ".$classlist->field_section_value));
+
+ 
+	 if ($cap){
+ 		$rostercaption = "<h3>".$classname->title."</h3>";
+ 	} else {
+ 		$rostercaption = "";
+ 	}
+ 
+	$thetable = theme('table', $rosterheader, $rosterrows, array('width' => '100%', 'class' => 'uc-orders-table', 'style' => 'clear: right;'), $rostercaption);
+	
+	return $thetable;
+}

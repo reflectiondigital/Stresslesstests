@@ -1,0 +1,9 @@
+; $Id: forms.info,v 1.1.2.1 2007/06/18 23:06:44 dww Exp $
+name = Forms
+description = "Allows the creation of custom forms (to be used by other modules)"
+
+; Information added by drupal.org packaging script on 2007-09-10
+version = "5.x-1.x-dev"
+project = "forms"
+datestamp = "1189382597"
+

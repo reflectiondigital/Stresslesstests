@@ -1,0 +1,1 @@
+var $j = jQuery.noConflict();$j(document).ready(function() {   $j('fieldset.group-student-info').hide();});

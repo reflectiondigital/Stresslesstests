@@ -1,0 +1,10 @@
+; $Id: greybox.info,v 1.1.2.1 2007/07/14 17:53:00 Gurpartap Exp $
+name = Greybox Redux
+description = Provides an inline pop-up window to view a different webpage.
+package = Javascript
+
+; Information added by drupal.org packaging script on 2008-12-04
+version = "5.x-1.3"
+project = "greybox"
+datestamp = "1228392317"
+

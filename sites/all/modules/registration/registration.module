@@ -1,0 +1,114 @@
+<?php
+
+global $node;
+
+function registration_form_alter($form_id, &$form) {
+	if ($form_id=='register_node_form') {
+		
+		//initialize Javascript path for showing form sections
+		$js_path = drupal_get_path('module', 'registration');
+		
+		//Hide payment method field from non-authorized useres
+		 $user = $GLOBALS['user']; 
+		 		 
+ 		if (in_array('anonymous user', $user->roles)){
+ 			drupal_add_js('
+			$(document).ready(function() {
+				 $("fieldset.group-payment").hide();
+			});' ,'inline');
+ 		}
+ 		
+		//Put Products in the field based on drop down
+		drupal_add_js('
+			$(document).ready(function() {
+				//alert("working");
+				$("#edit-field-product-0-value").attr("readonly", true);
+				$("#edit-field-sliding-costs-key").change(function (){
+					$("#edit-field-sliding-costs-key option:selected").each(function () {
+						$("#edit-field-product-0-value").val($(this).text());
+					  });
+				}).change();
+			});' ,'inline');
+		
+		
+		// Get information and show Workshop Title with Link
+  	 	$theid = $_GET[id]; //node id passed in URL
+  	 	if ($theid){
+			  $result = (db_query('SELECT n.title as class, r.title, c.field_class_nid, c.field_stock_value FROM {node} n LEFT JOIN {content_type_class} c ON n.nid = c.nid LEFT JOIN {node_revisions} r ON c.field_class_nid = r.nid WHERE c.nid =  %s', $theid));
+			 
+			 while ($node1 = db_fetch_object($result)) {
+				$theclass = $node1->class;
+				$thetitle = $node1->title;
+				$classid = $node1->field_class_nid;
+				$stockleft = $node1->field_stock_value;
+			 } 
+		 
+		 	if($stockleft == 1){
+				$stockalert = "<strong>Only 1 spot left!</strong>";
+				
+				//Disable quantity setting, since there's only 1 left
+				drupal_add_js('
+				$(document).ready(function() {
+					$("#edit-field-qty-0-value").attr("disabled", true);
+					$("#edit-field-names-0-value-wrapper .description").hide();
+					$("#edit-field-qty-0-value-wrapper span.field-suffix").html("Only 1 left");
+
+				});' ,'inline');
+			}
+		 
+		 
+		 
+			$addltxt = "<b>Please complete the registration form.  After you have completed the payment information, you will be able to print out your registration form.</b>";
+				
+			$form['header'] = array(
+			 '#value' => variable_get('register_form_information', t('<h2>' .$theclass . ': '.$thetitle.'</h2><p>'.$addltxt.' </p>')),
+			 '#weight' => -20
+			);
+			
+			if ($classid == 13){ //13 is the parent class id, 1473 is adult learners
+				$formtype = "parent";
+			} else if ($classid == 1473) {
+				$formtype = "adult";
+			} else {
+				$formtype = "student";
+			}
+			
+			
+			
+			//Load proper javascript to show appropriate fields
+			if ($formtype == "parent"){ 
+				drupal_add_js('
+				$(document).ready(function() {
+					 $("fieldset.group-student-info").hide();
+				});' ,'inline');
+			} else if ($formtype == "student"){
+				drupal_add_js('
+				$(document).ready(function() {
+					 $("fieldset.group-parent-info").hide();
+				});' ,'inline');
+			} else {
+				drupal_add_js('
+				$(document).ready(function() {
+					 $("fieldset.group-student-info").hide();
+					 $("fieldset.group-parent-info").hide();
+				});' ,'inline');
+			}
+			
+			
+			
+		
+		} //end if theid
+		
+		print $nid;
+		
+  		
+  		
+		
+	
+ 		//Hide Preview Button
+ 		//$form['preview']['#disabled'] = true;
+ 		unset($form['preview']);
+ 	
+	
+	}// end if form is register_node_form
+}// end function

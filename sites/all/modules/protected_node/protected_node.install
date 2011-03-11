@@ -1,0 +1,113 @@
+<?php
+// $Id: protected_node.install,v 1.2.2.6 2008/10/14 08:58:01 tolmi Exp $
+
+
+/*
+ * @file
+ * Protected node installation file.
+ *
+ * This module allows nodes to be protected.
+ */
+
+/**
+ * Implementation of hook_install()
+ */
+function protected_node_install( ) {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql' :
+    case 'mysqli' :
+      db_query( '
+				CREATE TABLE {protected_nodes} (
+					nid int(10) unsigned NOT NULL,
+					passwd CHAR(40) NOT NULL,
+					PRIMARY KEY (nid)
+				) /*!40100 DEFAULT CHARACTER SET utf8 */;
+			' );
+      break;
+    case 'pgsql' :
+      db_query( '
+				CREATE TABLE {protected_nodes} (
+					nid INTEGER PRIMARY KEY,
+					passwd CHAR(40) NOT NULL
+				);
+			' );
+      break;
+  }
+
+  db_query( "UPDATE {system} SET weight = 80 WHERE name = 'protected_node' AND type = 'module'" );
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function protected_node_uninstall( ) {
+  db_query( 'DROP TABLE {protected_nodes}' );
+}
+
+/**
+ * Implementation of hook_update_N()
+ */
+function protected_node_update_1( ) {
+  global $protected_node_salt;
+
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql' :
+    case 'mysqli' :
+    case 'pgsql' :
+      $result = db_query( "SELECT nid, passwd FROM {protected_nodes}" );
+      while ( ($node = db_fetch_object( $result )) != null ) {
+        $log = update_sql( "UPDATE {protected_nodes} SET passwd = '" . sha1( $protected_node_salt . $node->passwd ) . "' WHERE nid = " . $node->nid );
+        $log['query'] = '****QUERY CONTAINS PASSWORD HASHES - REMOVED CONTENT****';
+        $ret[] = $log;
+      }
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update_N()
+ */
+function protected_node_update_2( ) {
+  node_access_rebuild();
+
+  return array();
+}
+
+/**
+ * Implementation of hook_update_N()
+ *
+ * We don't need a variable length column just 40 char one for the sha1 hash
+ */
+function protected_node_update_3( ) {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql' :
+    case 'mysqli' :
+      $ret[] = update_sql( "ALTER TABLE {protected_nodes} MODIFY COLUMN passwd CHAR(40) NOT NULL" );
+      break;
+    case 'pgsql' :
+      $ret[] = update_sql( "ALTER TABLE {protected_nodes} ALTER COLUMN passwd TYPE CHAR(40)" );
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update-N()
+ *
+ * Altering node weight from 100 to 80
+ * fixing issue #296685
+ *
+ */
+function protected_node_update_4( ) {
+  $ret = array();
+  $ret[] = update_sql( "UPDATE {system} SET weight = 80 WHERE name = 'protected_node' AND type = 'module'" );
+
+  return $ret;
+}

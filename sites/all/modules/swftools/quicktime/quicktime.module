@@ -1,0 +1,143 @@
+<?php
+// $Id: quicktime.module,v 1.1.2.2 2007/06/13 04:11:11 sime Exp $
+
+/**
+ * SWF Tools - Quicktime
+ *
+ * Enables embedding support for MOV files and also provides use of
+ * Geoff Stearn's qtobject.js *
+ *
+ * Author's Site.
+ * http://blog.deconcept.com/2005/01/26/web-standards-compliant-javascript-quicktime-detect-and-embed
+ */
+
+define('SWFTOOLS_MOV_DISPLAY_DIRECT', 'swftools_mov_display_direct'); // This is an 'action' method, for embedding MOV files.
+define('SWFTOOLS_MOV', 'swftools_mov');  // This is a 'player' method.
+define('SWFTOOLS_EMBED_QT_METHOD', 'swftools_embed_qt_method'); // This is an 'embed' method for JS replacement of MOV files.
+
+function quicktime_swftools_methods() {
+  $methods = array();
+  $methods[SWFTOOLS_EMBED_QT_METHOD]['qtobject_replace'] = array(
+    'name'        => 'qtobject_replace',
+    'module'      => 'quicktime',
+    'shared_file' => 'qtobject/qtobject.js',
+    'title'       => t('QTObject - Geoff Stearns'),
+  );
+  return $methods;
+
+  $media_player = array(
+    'name'        => SWFTOOLS_MOV,
+    'module'      => 'quicktime',
+    'title'       => t('Direct embedding of MOV file.'),
+//    'file'        => '',
+//    'version'     => '',
+//    'shared_file' => '',
+  );
+  $methods[SWFTOOLS_MOV_DISPLAY_DIRECT][SWFTOOLS_MOV] = $media_player;
+  return $methods;
+}
+
+/**
+ * Implementation of swftools_embed hook
+ * Returns the markup for the page, plus set necessary javascript.
+ *
+ */
+function quicktime_swftools_embed($action = 'add_js', $methods = FALSE, $vars = FALSE, $html_alt = '') {
+
+  static $qtobject_has_run;
+  static $qtobject_id = 0;
+
+  // Output javascript to the header
+  if (!$swfobject_has_run) {
+    // Add swfobject.js
+    drupal_add_js(swftools_get_player_path() .'/swfobject/swfobject.js');
+    drupal_add_js(_swfobject_header_js(), 'inline', 'header');
+    $swfobject_has_run = TRUE;
+    if ($action == 'add_js') {
+      // Exit early having put the javascript in the header.
+      return;
+    }
+  }
+  static $unique_id = 0;
+  $unique_id++;
+
+  // SWFObject needs an id so that the replacement script can take it as a parameter.
+  // Use time() to prevent caching issues.
+  $html = '<div id="swfobject-id-'. time() . $unique_id .'" class="swftools swfobject" '.
+           swftools_json_params($vars->params, 'swftools') .' '.">\n".
+           $html_alt .
+           '</div>';
+  return $html;
+}
+
+/**
+ * The jQuery code that will try to replace all elements after the page loads.
+ * This parses the JSON out of the 'swftools' attribute of all class="qtobject" divs.
+ *
+ * TODO: advanced technique with the preview image. This requires the preview image
+ * in place of the 'src' parameter.
+ */
+function _qtobject_header_js() {
+  $js = "
+  $(document).ready(function(){
+    $('.qtobject').each(function(i){
+      params = Drupal.parseJson($(this).attr('swftools'));
+	    var qt = new SWFObject(params['src'], '', params['width'], params['height']);
+      for (p in params) {
+        so.addParam(params[p]);
+      }
+      so.write(this.id);
+    });
+  });
+  ";
+  return $js;
+}
+
+/**
+ * Implementation of swftools_embed hook
+ * Returns the markup for the page.
+ *
+ * WORK IN PROGRESS, good info here: http://www.uic.edu/depts/accc/itl/realmedia/code/embed_quicktime.html
+ *
+ */
+function swftools_quicktime_embed($action = 'add_js', $methods = FALSE, $vars = FALSE, $preview = 'NA') {
+
+  if ($action == 'add_js') {
+    // No javascript stuff for this embed method to do.
+    return;
+  }
+
+  $P = $vars->params; // For legibility.
+
+  $width_attr = ($P['width']) ? ' width="'. $P['width'] .'"' : '';
+  $height_attr = ($P['height']) ? ' height="'. $P['height'] .'"' : '';
+
+  $autoplay = _swftools_tf($P['autoplay']);
+  $loop = _swftools_tf($P['loop']);
+  $controller = _swftools_tf($P['controller']);
+
+  $id = ($vars->othervars['id']) ? '<param name="id" value="'. $vars->othervars['id'] .'" />'."\n" : '';
+
+  $html =  '<div class="swftools"><object'. $width_attr . $height_attr . $id .'  classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab">'."\n" ;
+
+  $html .= '<param name="src" value="'. $P['src'] .'" />'."\n";
+  $html .= '<param name="qtsrc" value="'. $P['src'] .'" />'."\n" ;
+  $html .= '<param name="autoplay" value="'. $autoplay .'" />'."\n" ;
+  $html .= '<param name="loop" value="'. $loop .'" />'."\n" ;
+  $html .= '<param name="controller" value="'. $P['controller'] .'" />'."\n" ;
+  $html .= '<embed'
+        . $width_attr
+        . $height_attr
+        . $name
+        . $swliveconnect
+        .' src="'.     $P['src']     .'"'
+        .' qtsrc="'.     $P['src']     .'"'
+        .' autoplay="'.   $P['autoplay']   .'"'
+        .' loop="'.    $loop         .'"'
+        .' controller="'.   $controller   .'"'
+        .' pluginspage="http://www.apple.com/quicktime/"'
+        .' />'."\n" ;
+  $html .= '</object></div>'."\n" ;
+
+  return $html;
+}

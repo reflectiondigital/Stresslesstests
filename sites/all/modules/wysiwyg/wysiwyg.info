@@ -1,0 +1,11 @@
+; $Id: wysiwyg.info,v 1.1.2.3 2008/10/22 05:33:30 sun Exp $
+name = Wysiwyg
+description = Allows users to edit contents with client-side editors.
+package = User interface
+dependencies = jquery_update
+
+; Information added by drupal.org packaging script on 2010-03-08
+version = "5.x-2.1"
+project = "wysiwyg"
+datestamp = "1268063713"
+

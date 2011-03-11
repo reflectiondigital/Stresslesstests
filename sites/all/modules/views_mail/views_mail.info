@@ -1,0 +1,12 @@
+; $Id: views_mail.info,v 1.1.2.1 2008/06/15 07:30:05 somebodysysop Exp $
+name = Views mail
+description = Mail to a group as selected by a views view.
+package = Views
+dependencies = views content simplenews mimemail actions sched_act
+project = views_mail
+
+; Information added by drupal.org packaging script on 2008-06-15
+version = "5.x-1.2"
+project = "views_mail"
+datestamp = "1213515317"
+

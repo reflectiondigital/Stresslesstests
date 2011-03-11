@@ -1,0 +1,8 @@
+name = Protected Node
+description = Controls whether selected nodes are protected with a password.
+package = Access
+; Information added by drupal.org packaging script on 2009-02-28
+version = "5.x-1.4"
+project = "protected_node"
+datestamp = "1235815531"
+

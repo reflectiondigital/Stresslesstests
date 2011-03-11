@@ -1,0 +1,7 @@
+Stuff still TODO:
+
+* integrate a hook system for adding custom field types and custom validators
+* integration with Adrian's wizard.inc
+* methods for using custom field widgets
+  ( just offering all form_*() doesn't work, since the paramater lists are
+  often quite different (i.e. form_select vs form_textfield)

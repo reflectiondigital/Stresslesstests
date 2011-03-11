@@ -1,0 +1,30 @@
+Submenu Tree
+
+
+=======
+5.x-0.4
+
+Changed database table schema (and associated code refactoring)
+Added configurable titles (#188753)
+Added sibling menus (#188753)
+
+(Please read the readme for upgrading instructions)
+
+
+=======
+5.x-0.3
+
+Proper ordering of items (#189604).
+
+=======
+5.x-0.2
+
+Submenu Tree can be displayed in a block (#186880).
+
+
+=======
+5.x-0.1
+
+First release
+
+

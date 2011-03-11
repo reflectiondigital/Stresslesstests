@@ -1,0 +1,515 @@
+# Copyright Drupal.hu Fordítói Csapat <forditas [at] drupal.hu>
+# Generated from files:
+#  imce.module,v 1.8.2.24 2006/12/29 16:00:46 ufku
+#  imce.info,v 1.1.2.3 2006/12/21 09:58:55 ufku
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 5.x\n"
+"POT-Creation-Date: 2007-01-16 10:36+0100\n"
+"PO-Revision-Date: 2007-01-17 10:05+0100\n"
+"Last-Translator: Beregszászi Attila <melon@m42.hu>\n"
+"Language-Team: Drupal.hu Fordítói Csapat <forditas [at] drupal.hu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Country: HUNGARY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: imce.module:46
+msgid "IMCE settings"
+msgstr "IMCE beállítások"
+
+#: imce.module:47
+msgid "Control how your image/file browser works."
+msgstr "A kép/fájlböngésző működésének beállításai."
+
+#: imce.module:52;622
+msgid "Sub-folder tool"
+msgstr "Alkönyvtár eszköz"
+
+#: imce.module:67
+msgid "Personal files"
+msgstr "Személyes állományok"
+
+#: imce.module:96
+msgid "Anonymous"
+msgstr "Anonymous"
+
+#: imce.module:116;168
+msgid "filename"
+msgstr "fájlnév"
+
+#: imce.module:116
+msgid "size"
+msgstr "méret"
+
+#: imce.module:116;169
+msgid "dimensions"
+msgstr "felbontás"
+
+#: imce.module:116
+msgid "date"
+msgstr "dátum"
+
+#: imce.module:116
+msgid "operations"
+msgstr "műveletek"
+
+#: imce.module:126
+msgid "File was deleted due to quota exceed!"
+msgstr "A kvóta túllépése miatt a fájl törölve!"
+
+#: imce.module:133
+msgid "delete"
+msgstr "törlés"
+
+#: imce.module:137
+msgid "Directory is empty."
+msgstr "Üres könyvtár."
+
+#: imce.module:148
+msgid "Up"
+msgstr "Fel"
+
+#: imce.module:148
+msgid "Go"
+msgstr "Mehet"
+
+#: imce.module:157
+msgid "Upload File"
+msgstr "Feltöltés"
+
+#: imce.module:158
+msgid "Scale if necessary"
+msgstr "Átméretezés, ha szükséges"
+
+#: imce.module:159
+msgid "Create thumbnail"
+msgstr "Bélyegkép készítése"
+
+#: imce.module:161;530
+msgid "Dimensions for scaling"
+msgstr "Felbontás átméretezéshez"
+
+#: imce.module:161;161
+msgid "Quota"
+msgstr "Kvóta"
+
+#: imce.module:161
+msgid "Unlimited"
+msgstr "Korlátlan"
+
+#: imce.module:161
+msgid "Limits"
+msgstr "Korlátok"
+
+#: imce.module:161;595
+msgid "File size"
+msgstr "Fájlméret"
+
+#: imce.module:161
+msgid "Dimensions"
+msgstr "Felbontás"
+
+#: imce.module:166
+msgid "Resize image"
+msgstr "Kép átméretezése"
+
+#: imce.module:170
+msgid "Create a copy"
+msgstr "Másolat készítése"
+
+#: imce.module:178
+msgid "Image/File Browser"
+msgstr "Kép/Fájl Böngésző"
+
+#: imce.module:183
+msgid "Are you sure want to delete this file?"
+msgstr "Biztos, hogy törölhető ez a fájl?"
+
+#: imce.module:184
+msgid "view"
+msgstr "nézet"
+
+#: imce.module:185
+msgid "add"
+msgstr "hozzáadás"
+
+#: imce.module:186
+msgid "Display"
+msgstr "Megjelenítés"
+
+#: imce.module:186
+msgid "all"
+msgstr "mind"
+
+#: imce.module:186
+msgid "images"
+msgstr "képek"
+
+#: imce.module:186
+msgid "non-images"
+msgstr "nem képek"
+
+#: imce.module:197
+msgid "Keyboard shortcuts"
+msgstr "Billentyűparancsok"
+
+#: imce.module:197
+msgid "UP(previous), DOWN(next), DELETE, INSERT(add)"
+msgstr "FEL(előző), LE(következő), DELETE(törlés), INSERT(hozzáadás)"
+
+#: imce.module:202
+msgid "Directory"
+msgstr "Könyvtár"
+
+#: imce.module:204
+msgid "User"
+msgstr "Felhasználó"
+
+#: imce.module:204
+msgid "logout"
+msgstr "kijelentkezés"
+
+#: imce.module:225
+msgid "No files were uploaded."
+msgstr "Nem történt fájlfeltöltés."
+
+#: imce.module:232
+msgid "File upload error. Could not move uploaded file."
+msgstr "Feltöltési hiba. Nem sikerült a feltöltött fájl mozgatása."
+
+#: imce.module:241
+msgid "Invalid filename."
+msgstr "Helytelen fájlnév."
+
+#: imce.module:249;277
+msgid "Only images with .jpg, .gif, and .png extensions are allowed."
+msgstr "Csak a .jpg, .gif és .png kiterjesztésű képek engedélyezettek."
+
+#: imce.module:255
+msgid "Error scaling image."
+msgstr "Átméretezési hiba."
+
+#: imce.module:261
+msgid "Image was scaled to allowed dimensions."
+msgstr "A kép átméretezése sikerült a megengedett felbontásra."
+
+#: imce.module:264;357
+msgid "Image dimensions exceed the limit."
+msgstr "A kép felbontása átlépi a korlátokat."
+
+#: imce.module:272
+msgid "Invalid file extension. Allowed extensions are .jpg, .gif, .png, !ext"
+msgstr "Helytelen fájlnév kiterjesztés. Engedélyezett kiterjesztések: .jpg, .gif, .png, !ext"
+
+#: imce.module:283
+msgid "File size exceeds upload limit."
+msgstr "A fájlméret túllépi a feltöltési korlátot."
+
+#: imce.module:288;371
+msgid "You dont have enough free space."
+msgstr "Nincs elég szabad hely."
+
+#: imce.module:296;378
+msgid "Error copying the file."
+msgstr "Fájl másolási hiba."
+
+#: imce.module:304
+msgid "Upload successful."
+msgstr "Sikeres feltöltés."
+
+#: imce.module:318
+msgid "Thumbnail created."
+msgstr "A bélyegkép létrejött."
+
+#: imce.module:321
+msgid "Thumbnail can not be created."
+msgstr "A bélyegkép nem hozható létre."
+
+#: imce.module:332
+msgid "File deleted successfully."
+msgstr "A fájl törlés sikeres."
+
+#: imce.module:335
+msgid "Error deleting file."
+msgstr "Fájl törlési hiba."
+
+#: imce.module:346
+msgid "File does not exist."
+msgstr "A fájl nem létezik."
+
+#: imce.module:353
+msgid "File type is not supported."
+msgstr "A fájltípus nem támogatott."
+
+#: imce.module:364
+msgid "Error resizing image."
+msgstr "Kép átméretezési hiba."
+
+#: imce.module:386
+msgid "Resizing successful."
+msgstr "Az átméretezés sikeres."
+
+#: imce.module:395
+msgid "Error opening directory"
+msgstr "Könyvtár megnyitási hiba."
+
+#: imce.module:438
+msgid "Directory error!"
+msgstr "Könyvtár hiba!"
+
+#: imce.module:530;534;565;581
+msgid "Width"
+msgstr "Szélesség"
+
+#: imce.module:530;534;565;581
+msgid "Height"
+msgstr "Magasság"
+
+#: imce.module:532
+msgid "These dimensions will be used while scaling down newly uploaded big images."
+msgstr "Ez a felbontás kerül alkalmazásra a frissen feltöltött nagyméretű képek esetén."
+
+#: imce.module:534;581
+msgid "Thumbnail dimensions"
+msgstr "Bélyegkép felbontás"
+
+#: imce.module:536;587
+msgid "You can enable automatic thumbnail creation from newly uploaded images. To disable leave the fields blank."
+msgstr "Automatikus bélyegkép készítés engedélyezhető a frissen feltöltött képekre. A funkció mellőzéséhez üresen kell hagyni a mezőt."
+
+#: imce.module:538
+msgid "Your upload directory"
+msgstr "A feltöltés könyvtára"
+
+#: imce.module:538
+msgid "This directory must be relative to <strong>!filepath</strong> directory. So if you want to use <strong>!filepath/foldername</strong>, just enter <strong>foldername</strong> here. You may also enter <strong>/</strong> to use the file system root. If you leave it blank, u1 will be used."
+msgstr "A könyvtárnévnek a <strong>!filepath</strong> könyvtárhoz képest relatívnak kell lennie. A <strong>!filepath/valami</strong> használatához csak a <strong>valami</strong> nevet szükséges megadni. A fájlrendszer gyökerének használatához a <strong>/</strong> is megadható. Ha a mező üres, a könyvtárnév u1 lesz."
+
+#: imce.module:540;630
+msgid "Enable extras"
+msgstr "Extrák engedélyezése"
+
+#: imce.module:540;632
+msgid "This javascript package includes browsing enhancements like file sorting, keyboard shortcuts, file filtering, etc."
+msgstr "Ez a javascript csomag böngészési segédleteket tartalmaz, mint pl. fájl rendezés, billentyűparancsok, fájlnév szűrés, stb."
+
+#: imce.module:547
+msgid "delete files"
+msgstr "fájl törlés"
+
+#: imce.module:549
+msgid "Permissions"
+msgstr "Engedélyek"
+
+#: imce.module:553
+msgid "upload files"
+msgstr "fájl feltöltés"
+
+#: imce.module:558
+msgid "limitless upload"
+msgstr "korlátlan feltöltés"
+
+#: imce.module:560
+msgid "Enable/disable access for file upload and deletion in user directories. Limitless upload disables controlling filesize, image dimensions and quota."
+msgstr "Fájlfeltöltés és törlés engedélyezése a felhasználók könyvtárában. A korlátlan feltöltés kikapcsolja a fájlméret, kép felbontás és kvóta kezelését."
+
+#: imce.module:565
+msgid "Image dimensions"
+msgstr "Kép felbontása"
+
+#: imce.module:571
+msgid "Define the maximum dimensions for an image to be uploaded."
+msgstr "A feltöltendő kép maximális felbontásának meghatározása."
+
+#: imce.module:574
+msgid "Enable scaling of newly uploaded images."
+msgstr "Átméretezés engedélyezése az új feltöltött képeken."
+
+#: imce.module:576
+msgid "If a newly uploaded image has dimensions exceeding the limit, it will be scaled down instead of giving an error."
+msgstr "Ha a frissen feltöltött kép túllépi a felbontás korlátait, hibajelzés helyett átméretezésre kerül."
+
+#: imce.module:590
+msgid "Enable custom resizing."
+msgstr "Egyéni átméretezés engedélyezése."
+
+#: imce.module:592
+msgid "Users will be able to resize their images to any size up to allowed dimensions."
+msgstr "A felhasználók a korlátok erejéig tetszőleges felbontásra méretezhetik át képeiket."
+
+#: imce.module:597
+msgid "Define the maximum file size(KB) for an image to be uploaded."
+msgstr "A feltölthető képek maximális mérete (KB)."
+
+#: imce.module:600
+msgid "Upload quota"
+msgstr "Feltöltési korlát."
+
+#: imce.module:602
+msgid "Define the total upload quota(KB) per user."
+msgstr "A felhasználónkénti feltöltési kvóta mérete (KB)."
+
+#: imce.module:605
+msgid "Prefix for personal folder names"
+msgstr "Személyes mappanevek előtagja"
+
+#: imce.module:607
+msgid "Define the prefix that user IDs will be appended in order to create personal folders. Ex: entering \"u\" will result in folder names like u1, u14 etc. If you leave it blank, user IDs will be used as folder names."
+msgstr "A felhasználói azonosítók előtagja a személyes mappaneveknél. Pl. az \"u\" előtag a személyes mappaneveket a u1, u14, stb. formára alakítja. Ha az előtag üres, a személyes mappanevek a felhasználói azonosítókat veszik fel."
+
+#: imce.module:610
+msgid "Use a shared folder"
+msgstr "Megosztott könyvtár használata"
+
+#: imce.module:612
+msgid "If you want all your users to <strong>use a common folder instead of personal folders</strong>, here you can define that folder name (ex. images). Notice that shared upload means shared quota. If you are happy with personal folders leave this field blank."
+msgstr "Ha a felhasználók <strong>a személyes könyvtárak helyett egyetlen közös könyvtárat</strong> használhatnak, itt megadható a közös könyvtár neve (pl images). A közös könyvtár közös feltöltési korlátot is jelent! Ha a személyes könyvtárak használata megfelelő, ezt a mezőt üresen kell hagyni."
+
+#: imce.module:615
+msgid "Enable sub-folder navigation."
+msgstr "Alkönyvtár navigáció engedélyezése."
+
+#: imce.module:617
+msgid "This option allows users to manage multiple folders under their main folder. Only the users who have at least one sub-folder can use this feature."
+msgstr "A személyes könyvtáron belül több könyvtár kezelését teszi lehetővé a felhasználók számára. Csak azok a felhasználók használhatják ezt a lehetőséget, akiknek a személyes könyvtárukban legalább egy alkönyvtáruk van."
+
+#: imce.module:620
+msgid "Default sub-folder names"
+msgstr "Alapértelmezett alkönyvtár nevek"
+
+#: imce.module:622
+msgid "Enter comma separated sub-folder names that will be created automatically, if the sub-folder navigation is enabled. Each user of this role will have these folders in their main folder by default. Additional folders can be created using !subfoldertool. You should note that total user quota increases with every new sub-folder because the quotation is per folder basis."
+msgstr "Vesszővel elválasztott alkönyvtár nevek adhatók meg, ezek automatikusan létrejönnek, ha az alkönyvtár navigáció engedélyezett. Az így létrehozott könyvtárak alapértelmezés szerint a csoport minden felhasználójának rendelkezésére állnak. További könyvtárak hozhatók létre az !subfoldertool használatával. Fontos megjegyezni, hogy a teljes felhasználói kvóta minden egyes új alkönyvtárral növekszik, mert a kvóta kiszámítása könyvtár alapon történik."
+
+#: imce.module:625
+msgid "Non-image file support"
+msgstr "Nem kép fájlok támogatása"
+
+#: imce.module:627
+msgid "Although IMCE is mainly designed to browse images, it supports uploading and browsing of any file type. If you like to use this feature, define your <strong>allowed non-image file extensions</strong> here with a comma between them. Ex .doc, .pdf, .zip.  Note that, image upload limits also apply for these files. For a pure image browser leave this field blank."
+msgstr "Bár az IMCE elsősorban képek böngészéséhez készült, bármilyen fájltípus feltöltését és böngészését támogatja. A funkció használhatához meg kell határozni az <strong>engedélyezett nem kép fájlnév kiterjesztéseket</strong> vesszővel elválasztott felsorolásként. Pl. .doc, .pdf, .zip. A feltöltési korlátok ezekre a fájlokra is érvényesek. Egyszerű képböngésző használatához a mező üresen hagyható."
+
+#: imce.module:644
+msgid "Common settings"
+msgstr "Általános beállítások"
+
+#: imce.module:646
+msgid "Enable tinyMCE support"
+msgstr "TinyMCE támogatás engedélyezése"
+
+#: imce.module:648
+msgid "Make IMCE the default image/file browser for tinyMCE."
+msgstr "Az IMCE beállítása alapértelmezett kép/fájlböngészőként a tinyMCE szerkesztőben."
+
+#: imce.module:651
+msgid "Enable FCKEditor support"
+msgstr "FCKEditor támogatás engedélyezése"
+
+#: imce.module:653
+msgid "Replace the built-in file browser of FCKeditor with IMCE."
+msgstr "Az IMCE használata az FCKEditor beépített fájlböngészője helyett."
+
+#: imce.module:656
+msgid "Enable inline image/file insertion into plain textareas"
+msgstr "Kép/fájl beszúrás egyszerű szövegdobozba"
+
+#: imce.module:659
+msgid "This feature allows you to add your images or files as <strong>html code into any plain textarea</strong>. This is useful especially when you dont use a wysiwyg editor such as tinyMCE or FCKeditor. Enter <strong>comma separated textarea IDs</strong> if you want to enable this feature. Otherwise, leave it blank. Hint: ID of Body fields in most node types is edit-body."
+msgstr "Ez a funkció lehetővé teszi képek vagy fájlok hozzáadását <strong>html kódok használatával bármilyen egyszerű szövegdobozba</strong>. Ez különösen akkor hasznos, ha nincs telepítve wysiwyg szerkesztő, mint pl. a tinyMCE vagy az FCKeditor. <strong>Vesszővel elválasztott szövegdoboz azonosítókat (ID)</strong> kell megadni a funkció engedélyezéséhez, egyébként üresen hagyható. Tipp: a legtöbb tartalomtípusnál a fő tartalom szövegdobozának azonosítója edit-body."
+
+#: imce.module:668
+msgid "Role precedence"
+msgstr "Csoport elsőség"
+
+#: imce.module:670
+msgid "A user having <strong>multiple roles</strong> gets the permissions of the highest one. Sort role IDs according to their <strong>precedence from higher to lower</strong> by putting > in between. Here is the id-name pairs of roles having access to IMCE:"
+msgstr "Ha egy felhasználó <strong>több csoportnak</strong> is tagja, a legelső csoport jogosultságaival rendelkezik. A csoport azonosítókat <strong>az elsőség alapján csökkenő sorrendbe</strong> kell rendezni, a csoportnevek közé > karaktert helyezve. IMCE elérése jogosultsággal a következő azonosító-csoportnév párosítások rendelkeznek:"
+
+#: imce.module:675
+msgid "Settings for user #1"
+msgstr "#1 felhasználói beállításai"
+
+#: imce.module:679
+msgid "Settings for the role: !role"
+msgstr "!role csoport beállításai"
+
+#: imce.module:682
+msgid "Save"
+msgstr "Mentés"
+
+#: imce.module:715
+msgid "The changes have been saved."
+msgstr "A változtatások elmentve."
+
+#: imce.module:763
+msgid "Insert !image or !link."
+msgstr "!image vagy !link beszúrása."
+
+#: imce.module:763
+msgid "image"
+msgstr "kép"
+
+#: imce.module:763
+msgid "link"
+msgstr "hivatkozás"
+
+#: imce.module:776
+msgid "Browse this user's files using !yours or !his"
+msgstr "A felhasználói fájljainak böngészése "
+
+#: imce.module:776
+msgid "your previlidges"
+msgstr "jogosultságok"
+
+#: imce.module:776
+msgid "his/her previlidges"
+msgstr "jogosultságai"
+
+#: imce.module:806
+msgid "<p>Here you can create sub-folders for your users. Multiple folder creation is possible at a time with the <strong>*</strong> character. For example, specifying <strong>user*/foo</strong> will create <strong>foo</strong> named folders under each folder starting with <strong>user</strong>. */foo*/bar will create bar named folders under folders starting with foo in each folder of file system path.</p>"
+msgstr "<p>Itt hozhatók létre felhasználói alkönyvtárak. Több könyvtár egyszeri létrehozása is lehetséges a <strong>*</strong> karakter használatával. Például <strong>user*/foo</strong> megadása <strong>foo</strong> nevű könyvtárakat hoz létre minden <strong>user</strong>-rel keződő könyvtárban. A */foo*/bar megadása <strong>bar</strong> nevű könyvtárakat hoz létre minden <strong>foo</strong>-val kezdődő könyvtárban a fájlrendszer elérési útján belül."
+
+#: imce.module:807
+msgid "Folder path"
+msgstr "Könyvtár útvonal"
+
+#: imce.module:808
+msgid "Create"
+msgstr "Létrehozás"
+
+#: imce.module:838
+msgid "Specified path must be under file sytem path."
+msgstr "Az elérési útvonalnak a fájlrendszer útvonalán belül kell lennie."
+
+#: imce.module:850
+msgid "No matching sub-folders found."
+msgstr "Nincsenek egyező alkönyvtárak."
+
+#: imce.module:28
+msgid "access imce"
+msgstr "imce elérése"
+
+#: imce.module:28
+msgid "administer imce"
+msgstr "imce adminisztrációja"
+
+#: imce.info:0
+msgid "IMCE"
+msgstr "IMCE"
+
+#: imce.info:0
+msgid "An image/file uploader and browser supporting personal directories and user quota."
+msgstr "Kép/fájl feltöltő és böngésző személyes könyvtár és feltöltési korlát támogatással."
+
+#: imce.info:0
+msgid "5.x-1.x-dev"
+msgstr "5.x-1.x-dev"
+
+#: imce.info:0
+msgid "imce"
+msgstr "imce"
+

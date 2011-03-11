@@ -1,0 +1,42 @@
+<?php
+// $Id: views_bonus_panels_threecol_stk.module,v 1.2.2.2 2007/02/03 18:26:13 merlinofchaos Exp $
+
+function views_bonus_panels_threecol_stk_views_style_plugins() {
+  $items['panels_threecol_stk'] = array(
+    'name' => t('Panels: Teasers, 1 top + 3 columns'),
+    'theme' => 'views_bonus_panels_threecol_stacked',
+    'summary_theme' => 'views_summary',
+  );
+  return $items;
+}
+
+/**
+ * Because views doesn't currently support configuration options for
+ * plugins, the best way to make configuration changes here is 
+ * to override the theme.
+ */
+function theme_views_bonus_panels_threecol_stacked($view, $nodes, $type) {
+  $teasers = true;
+  $links = true;
+
+  $content = array();
+  foreach ($nodes as $count => $n) {
+    $node = node_load($n->nid);
+    if ($count == 0) {
+      $section = 'top';
+    }
+    else switch (($count - 1) % 3) {
+      case 0:
+        $section = 'left';
+        break;
+      case 1:
+        $section = 'middle';
+        break;
+      case 2:
+        $section = 'right';
+        break;
+    }
+    $content[$section] .= node_view($node, $teasers, false, $links);
+  }
+  return panels_print_layout('threecol_33_34_33_stacked', $content);
+}

@@ -1,0 +1,104 @@
+# Danish translation of Drupal (forms.module)
+# Copyright 2005, 2007 Morten Wulff <wulff@ratatosk.net>
+msgid ""
+msgstr ""
+"Project-Id-Version: Danish translation of Drupal (forms.module) $Id: da.po,v 1.2.4.1 2007/09/09 22:22:31 wulff Exp $\n"
+"POT-Creation-Date: 2005-07-06 14:43+0200\n"
+"PO-Revision-Date: 2007-09-10 00:21+0100\n"
+"Last-Translator: Morten Wulff <wulff@ratatosk.net>\n"
+"Language-Team: Danish <l10n@drupaldanmark.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Danish\n"
+"X-Poedit-Country: DENMARK\n"
+
+#: forms.module:7
+msgid "The forms module is a behind the scenes helper module.  It is intended as a generic form building module, allowing module developers to include forms to be created by administrators. If the form module is enabled for the survey module, a user could create custom form elements for their surveys through a web interface. You can not administer this module."
+msgstr "Formular-modulet hjælper med at bygge formularer, og gør det muligt for modul-udviklere at bruge formularer bygget af administratoren. Hvis modulet er aktiveret for survey-modulet kan brugerne lave formular-elementer vha. en web-grænseflade. Du kan ikke administrere dette modul."
+
+#: forms.module:8
+msgid "For more information please read the configuration and customization handbook <a href=\"%forms\">Forms page</a>."
+msgstr "Læs håndbogens afsnit om <a href=\"%forms\">formularer</a> for yderligere information."
+
+#: forms.module:118
+msgid "Field '%name' saved successfully"
+msgstr "Feltet '%name' gemt"
+
+#: forms.module:154
+msgid "Type"
+msgstr "Type"
+
+#: forms.module:160
+msgid "Title"
+msgstr "Titel"
+
+#: forms.module:162
+msgid "The title will be shown in the user interface."
+msgstr "Titlen vises i brugergrænsefladen."
+
+#: forms.module:168
+msgid "Explanation"
+msgstr "Forklaring"
+
+#: forms.module:170
+msgid "An optional explanation to go with the new field.  The explanation will be shown to the user."
+msgstr "En valgfri forklaring til det nye felt. Forklaringen vises til brugerne"
+
+#: forms.module:176
+msgid "Selection options"
+msgstr "Valgmuligheder"
+
+#: forms.module:178
+msgid "For select fields only. A list of all options - delimited by semicolons (e.g. red;blue;green). To have different labels from values, use colons e.g. 1:red;2:blue;3:green"
+msgstr "Kun for 'select' felter. En liste af valgmuligheder adskilt med semikolon (f.eks. rød;blå;grøn). Brug kolon til at adskille etiketter fra værdier (f.eks. 1:rød;2:blå;3:grøn)."
+
+#: forms.module:184
+msgid "Allow multiple selection"
+msgstr "Tillad flere valg"
+
+#: forms.module:190
+msgid "Weight"
+msgstr "Vægt"
+
+#: forms.module:194
+msgid "The weights define the order in which the form fields are shown.  Lighter fields \"float up\" towards the top of the category."
+msgstr "Vægten bestemmer i hvilken rækkefølge felterne vises. Lette felter vises først."
+
+#: forms.module:199
+msgid "Required field"
+msgstr "Påkrævet felt"
+
+#: forms.module:204
+msgid "Validation function"
+msgstr "Tjek gyldighed"
+
+#: forms.module:205
+msgid "Name of a function to test the input value"
+msgstr "Navnet på den funktion der skal teste gyldigheden af inddata"
+
+#: forms.module:319
+msgid "%field is required"
+msgstr "%field er påkrævet"
+
+#: forms.module:327
+msgid "Invalid entry for %field"
+msgstr "Ugyldig værdi af %field"
+
+#: forms.module:378
+msgid "--"
+msgstr "--"
+
+#: forms.module:0
+msgid "forms"
+msgstr "formularer"
+
+#: forms.info:0
+msgid "Forms"
+msgstr "Formularer"
+
+#: forms.info:0
+msgid "Allows the creation of custom forms (to be used by other modules)"
+msgstr "Gør det muligt at oprettet formularer (til brug for andre moduler)"
+

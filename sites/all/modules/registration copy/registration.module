@@ -1,0 +1,89 @@
+<?php
+
+
+function registration_form_alter($form_id, &$form) {
+	if ($form_id=='register_node_form') {
+		
+		//initialize Javascript path for showing form sections
+		$js_path = drupal_get_path('module', 'registration');
+		
+		// Get information and show Workshop Title with Link
+  	 	$theid = $_GET[id]; //node id passed in URL
+  	 	if ($theid){
+			
+			// $result = (db_query('SELECT n.title, r.title AS class FROM {node} n LEFT JOIN {content_type_class} p ON n.nid = p.nid LEFT JOIN {node_revisions} r ON p.field_class_nid = r.nid WHERE n.nid = %s', $theid));
+			 
+			 
+			  $result = (db_query('SELECT n.title as class, r.title, c.field_class_nid FROM {node} n LEFT JOIN {content_type_class} c ON n.nid = c.nid LEFT JOIN {node_revisions} r ON c.field_class_nid = r.nid WHERE c.nid =  %s', $theid));
+			 
+			 
+			 while ($node1 = db_fetch_object($result)) {
+				$theclass = $node1->class;
+				$thetitle = $node1->title;
+				$classid = $node1->field_class_nid;
+			 } 
+		 
+			$addltxt = "<b>Please complete the registration form.  After you have completed the payment information, you will be able to print out your registration form.</b>";
+				
+			$form['header'] = array(
+			 '#value' => variable_get('register_form_information', t('<h2>' .$theclass . ': '.$thetitle.'</h2><p>'.$addltxt.'</p>')),
+			 '#weight' => -20
+	);
+  		
+  		
+	
+		 
+			//Figure out if this is a parent class or not
+			/*$parent_term = 4; //ID for parent term
+			$parent = false;
+			
+			$terms = taxonomy_node_get_terms($theid);
+	
+			foreach ($terms as $key => $tobj) { // $key is the TID for the node.
+			  if ($tobj->tid == $parent_term){
+				$parent = true;
+			  }
+			}*/
+			
+			if ($classid == 13){ //13 is the parent class id
+				$parent = true;
+			} else {
+				$parent = false;
+			}
+			
+			
+			//Load proper javascript to show appropriate fields
+			if ($parent == true){ 
+				drupal_add_js($js_path . '/parent.js');
+				//drupal_add_js($hide_student, 'inline');
+			} else {
+				drupal_add_js($js_path . '/student.js');
+			}
+			
+			
+		
+	
+		
+		
+		//Hide payment method field from non-authorized useres
+		 $user = $GLOBALS['user']; 
+ 		//if (in_array('anonymous user', $user->roles)){
+ 			//drupal_set_message("you are anonymous");
+ 			drupal_add_js($js_path . '/registration.js');
+ 		//}
+		
+				
+		
+			
+		
+		
+		 }// endif theid
+		 
+ 
+ 		//Hide Preview Button
+ 		//$form['preview']['#disabled'] = true;
+ 		unset($form['preview']);
+ 	
+	
+	}// end if form is register_node_form
+}// end function

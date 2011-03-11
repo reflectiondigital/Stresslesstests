@@ -1,0 +1,41 @@
+<?php
+// $Id: forms.install,v 1.2 2006/07/13 04:59:21 walkah Exp $
+
+/**
+ * Implementation of hook_install()
+ */
+function forms_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE IF NOT EXISTS {forms} (
+        fid int(10) unsigned NOT NULL,
+        type varchar(16) NOT NULL,
+        created int(10) NOT NULL,
+        PRIMARY KEY (fid)   
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+
+      db_query("CREATE TABLE {form_fields} (
+        ffid int(10) unsigned NOT NULL auto_increment,
+        fid int(10) unsigned NOT NULL,
+        title varchar(255) default NULL,
+        explanation TEXT default NULL,
+        page varchar(255) default NULL,
+        type varchar(128) default NULL,
+        weight tinyint(1) DEFAULT '0' NOT NULL,
+        required tinyint(1) DEFAULT '0' NOT NULL,
+        flags text,
+        validation text,
+        options text,
+        multiple tinyint(1) DEFAULT '0' NOT NULL,
+        PRIMARY KEY (ffid)
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+  }
+}
+
+/**
+ * Updates
+ */
+function forms_update_1() {
+  return _system_update_utf8(array('forms', 'form_fields'));
+}

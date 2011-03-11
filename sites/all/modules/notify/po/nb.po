@@ -1,0 +1,311 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: notify\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-07-15 19:27+0100\n"
+"Last-Translator: Sten Johnsen <sten@bedre-bilder.no>\n"
+"Language-Team: THINEA Webteknologi <sten@thinea.no>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Norwegian Bokmal\n"
+"X-Poedit-Country: NORWAY\n"
+
+#: notify.module:10
+msgid "The notification module allows users to subscribe to periodic e-mails which include all new or revised content and/or comments much like the daily news letters sent by some websites.  Even if this feature is not configured for normal site users, it can be a useful feature for an administrator of a site to monitor content submissions and comment posts."
+msgstr "Varslingsmodulentilbyr brukere å abbonnere på periodiske e-poster som inneholder allt nytt eller endret innhold og/eller kommentarer - mye likt daglige nyhetsbrev sendt fra noen nettsteder. Selv om denne modulen ikke er konfigurert for normale brukere av nettstedet, kan den være et nyttig redskap for en administrator av et nettsted slik at hun kan overvåke nytt innhold og kommentere innlegg."
+
+#: notify.module:11
+msgid "The administrator sets the frequency of the e-mails in the notify administration interface. They can also set how many e-mail failures should occur before notify stops sending notifications.  Note that cron must be enabled for notifications to be sent out."
+msgstr "Administrator sette opp frekvensen av e-postene i administrator grensesnittet. Man kan også sette hvor mange feilmeldinger som skal opptre før varslingsmodulen slutter å sende varsel. Merk at cron må være påslått for at varsel skal sendes ut."
+
+#: notify.module:12
+msgid "<p>You can</p><ul><li>set up your site to run tasks automatically at required intervals. For more information, see <a href=\"@admin-help-system\">cron</a>.</li><li>administer notify <a href=\"@admin-settings-notify\">administer &gt;&gt; settings &gt;&gt; notify</a>.</li></ul>"
+msgstr "<p>Du kan</p><ul><li>sette opp ditt nettsted til å kjøre aktiviteter automatisk ved bestemte intervall. For mer informasjon, se<a href=\"@admin-help-system\">cron</a>.</li><li>administrer varsling <a href=\"@admin-settings-notify\">Administrerr &gt;&gt; Innstillinger &gt;&gt; varsling</a>.</li></ul>"
+
+#: notify.module:13
+msgid "For more information please read the configuration and customization handbook <a href=\"@notify\">Notify page</a>."
+msgstr "For mer informasjon, vennligst les konfigurasjon og tilpasningshåndboken  <a href=\"@notify\">Varslingssiden</a>."
+
+#: notify.module:16
+msgid "Warning!"
+msgstr "Advarsel!"
+
+#: notify.module:16
+msgid "Nodes or comments which include <strong>PHP code</strong> might in some circumstances <strong>break your web site</strong>. They might cause <em>notify</em> to run in a loop or completely malfunction. This is not a bug: if you are adding some PHP code into your content, <em>you are supposed to know what you are doing</em>. See the <a href=\"@notify\">handbook page for notify.module</a>."
+msgstr "Noder eller kommentarer som inneholder <strong>PHP kode</strong> kan under noen omstendigheter <strong>bryte opp ditt nettsted</strong>. De kan gjøre at <em>varslingsmodulen</em> kjører i en evig sløyfe eller feiler helt. Dette er ikke en feil: dersom du legger til PHP kode i ditt innhold, <em>bør du vite hva du gjør</em>. <a href=\"@notify\">Se håndboksiden for varslingsmodulen</a>. "
+
+#: notify.module:39
+msgid "Never"
+msgstr "Aldri"
+
+#: notify.module:46
+msgid "Send notifications every"
+msgstr "Send en varsling hver"
+
+#: notify.module:49
+msgid "How often should new content notifications be sent? Requires cron to be running."
+msgstr "Hvor ofte skal varslinger om nytt innhold sendes? Krever at cron kjører regelmessig."
+
+#: notify.module:54
+msgid "Number of failed sends after which notifications are disabled"
+msgstr "Antall feilsendinger før varslinger slås av."
+
+#: notify.module:56
+#: ;162;170;182
+msgid "Disabled"
+msgstr "Deaktivert"
+
+#: notify.module:100
+msgid "My notification settings"
+msgstr "Mine varslingsinnstillinger"
+
+#: notify.module:108
+msgid "Notifications"
+msgstr "Varslinger"
+
+#: notify.module:115
+#: ;129
+msgid "Notification settings"
+msgstr "Varslingsinnstillinger"
+
+#: notify.module:116
+msgid "Adjust settings for new content notifications sent by e-mail."
+msgstr "Endre innstillinger for varslinger av nytt innhold sendt på e-post."
+
+#: notify.module:158
+msgid "Master switch"
+msgstr "Hovedbryter"
+
+#: notify.module:160
+msgid "Notify status"
+msgstr "Varslingsstatus"
+
+#: notify.module:162
+#: ;170;182
+msgid "Enabled"
+msgstr "Aktivert"
+
+#: notify.module:163
+msgid "Do you wish to receive periodic e-mails when new content is posted?"
+msgstr "Ønsker du å motta periodiske e-poster når nytt innhold blir lagt til?"
+
+#: notify.module:166
+msgid "Detailed settings"
+msgstr "Detaljerte innstillinger"
+
+#: notify.module:168
+msgid "Notify new content"
+msgstr "Varsle nytt innhold"
+
+#: notify.module:171
+msgid "Include new content in the notification mail."
+msgstr "Inkluder nytt innhold i varslingen."
+
+#: notify.module:174
+#: ;266
+msgid "Content"
+msgstr "Innhold"
+
+#: notify.module:176
+#: ;217
+msgid "Title only"
+msgstr "Kun tittel"
+
+#: notify.module:176
+#: ;217
+msgid "Title + Teaser"
+msgstr "Tittel og ingress"
+
+#: notify.module:176
+#: ;217
+msgid "Title + Body"
+msgstr "Tittel og brødtekst"
+
+#: notify.module:177
+msgid "Select the amount of each post that you would like to see in your notification e-mails."
+msgstr "Velg hvor mye av hver posting du ønsker å ha med i dine varslinger."
+
+#: notify.module:180
+msgid "Notify new comments"
+msgstr "Varsle nye kommentarer"
+
+#: notify.module:183
+msgid "Include new comments in the notification mail."
+msgstr "Inkluder nye kommentarer i varslingen."
+
+#: notify.module:186
+#: ;229
+msgid "Save settings"
+msgstr "Lagre innstillinger"
+
+#: notify.module:189
+msgid "Your e-mail address must be specified on your <a href=\"@url\">my account</a> page."
+msgstr "Din e-post adresse må være spesifisert på din <a href=\"@url\">Min konto</a> side."
+
+#: notify.module:198
+#: ;243
+msgid "Notify settings saved."
+msgstr "Varslingsinnstillinger er lagret."
+
+#: notify.module:207
+msgid "The following table shows all users that have notifications enabled."
+msgstr "Følgende tabell viser alle brukere som har varsling påslått."
+
+#: notify.module:223
+msgid "Flush e-mail queue"
+msgstr "Tøm e-post kø."
+
+#: notify.module:226
+msgid "Send out any pending notification e-mails currently in queue."
+msgstr "Send ut ventende varslinger i køen."
+
+#: notify.module:250
+msgid "@count pending notification e-mails have been sent."
+msgstr "@count ventende varslinger er sendt."
+
+#: notify.module:253
+msgid "@count notification e-mails could not be sent."
+msgstr "@count varslinger kunne ikke sendes."
+
+#: notify.module:256
+msgid "No notification e-mails needed to be sent."
+msgstr "Ingen varslinger må sendes."
+
+#: notify.module:266
+msgid "Username"
+msgstr "Brukernavn"
+
+#: notify.module:266
+msgid "E-mail address"
+msgstr "E-post adresse"
+
+#: notify.module:266
+msgid "Teasers"
+msgstr "Ingress"
+
+#: notify.module:266
+msgid "Comment"
+msgstr "Kommentar"
+
+#: notify.module:266
+msgid "Failed attempts"
+msgstr "Forsøk som feilet"
+
+#: notify.module:280
+msgid "No users have notifications enabled."
+msgstr "Ingen brukere ha varsling aktivert."
+
+#: notify.module:370
+msgid "Published"
+msgstr "Publisert"
+
+#: notify.module:373
+msgid "Unpublished"
+msgstr "Ikke publisert"
+
+#: notify.module:379
+msgid "@title"
+msgstr "@title"
+
+#: notify.module:380
+msgid "@status @type by @author"
+msgstr "@status @type av @author"
+
+#: notify.module:388
+msgid "Recent content - @count"
+msgstr "Nytt innhold - @count"
+
+#: notify.module:411
+msgid "@count attached to @type posted by @author: @title"
+msgstr "@count vedlagt  @type postet av @author: @title"
+
+#: notify.module:415
+msgid "@title by @author"
+msgstr "@title av @author"
+
+#: notify.module:423
+msgid "Recent comments - @count"
+msgstr "Nye kommentarer - @count"
+
+#: notify.module:435
+msgid "@sitename new content notification for @username"
+msgstr "@sitename varsling om nytt innhold for @username"
+
+#: notify.module:437
+msgid "Greetings @user,"
+msgstr "Hei @user,"
+
+#: notify.module:440
+msgid "This is an automatic e-mail from @sitename."
+msgstr "Dette er en automatisk e-post fra @sitename."
+
+#: notify.module:441
+msgid "To stop receiving these e-mails, change your notification preferences at @notify-url"
+msgstr "For å stoppe flere av disse e-postene, endre dine varslingsinnstillinger på @notify-url"
+
+#: notify.module:447
+msgid "Notify: User %name (%mail) could not be notified. Mail error."
+msgstr "Varsling: Bruker %name (%mail) kunne ikke motta varsling. Mail feil."
+
+#: notify.module:451
+msgid "Notify: User %name (%mail) notified successfully."
+msgstr "Varsling: Bruker %name (%mail) varslet."
+
+#: notify.module:447
+msgid "error"
+msgstr "feil"
+
+#: notify.module:451
+msgid "user"
+msgstr "bruker"
+
+#: notify.module:388
+msgid "1 new post"
+msgid_plural "@count new posts"
+msgstr[0] "1 new post"
+msgstr[1] "1 ny posting"
+
+#: notify.module:411
+#: ;423
+msgid "1 new comment"
+msgid_plural "@count new comments"
+msgstr[0] "1 new comment"
+msgstr[1] "1 ny kommentar"
+
+#: notify.module:87
+msgid "access notify"
+msgstr "tilgang til varsling"
+
+#: notify.module:87
+msgid "administer notify"
+msgstr "administrer varsling"
+
+#: notify.module:0
+msgid "notify"
+msgstr "varsling"
+
+#: notify.install:36
+msgid "Notify module installed successfully."
+msgstr "Varslingsmodulen er installert."
+
+#: notify.install:39
+msgid "Table installation for the Notify module was unsuccessful. The tables may need to be installed by hand."
+msgstr "Tabellinstalleringen for varslingsmodulen kunne ikke gjennomføres. Tabellene må kanskje installeres manuelt."
+
+#: notify.install:67
+msgid "The settings page for the notify.module is now to be found in Administer > Site configuration > Notification settings."
+msgstr "Innstillingssiden for varslingsmodulen kan nå finnes i Administrer > Innstillinger > Varslingsinnstillinger."
+
+#: notify.info:0
+msgid "Notify"
+msgstr "Varsling"
+
+#: notify.info:0
+msgid "Enables notifications of new content and comments by e-mail."
+msgstr "Aktiverer varsling av nytt innhold og kommentarer via e-post."
+
+#: notify.info:0
+msgid "Mail"
+msgstr "Post"
+

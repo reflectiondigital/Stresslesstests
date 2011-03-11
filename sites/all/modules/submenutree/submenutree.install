@@ -1,0 +1,64 @@
+<?php
+// $Id: submenutree.install,v 1.2.2.1 2007/11/11 02:23:00 bengtan Exp $
+// Modeline for drupal
+// vim: set expandtab tabstop=2 shiftwidth=2 autoindent smartindent filetype=php:
+
+/**
+ * Implementation of hook_install().
+ */
+function submenutree_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {node_submenutree} (
+        nid int(10) unsigned NOT NULL default '0',
+        submenutree_enable int(10) unsigned NOT NULL default '0',
+        submenutree_title varchar(255) NOT NULL default '',
+        submenutree_display int(10) unsigned NOT NULL default '0',
+        submenutree_weight int(10) unsigned NOT NULL default '0',
+        siblingmenutree_enable int(10) unsigned NOT NULL default '0',
+        siblingmenutree_title varchar(255) NOT NULL default '',
+        siblingmenutree_display int(10) unsigned NOT NULL default '0',
+        siblingmenutree_weight int(10) unsigned NOT NULL default '0',
+        PRIMARY KEY (nid) 
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
+
+      /*
+      db_query("CREATE TABLE {node_submenutree} (
+        nid int(10) unsigned NOT NULL default '0',
+        display int(10) unsigned NOT NULL default '0',
+        weight int(10) unsigned NOT NULL default '0',
+        PRIMARY KEY (nid) 
+      */
+      //  ) /*!40100 DEFAULT CHARACTER SET utf8 */");
+      break;
+  }
+}
+
+function submenutree_update_5001() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD submenutree_enable int(10) unsigned NOT NULL default '0' AFTER nid");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD submenutree_title varchar(255) NOT NULL default '' AFTER submenutree_enable");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} CHANGE display submenutree_display int(10) unsigned NOT NULL default '0'");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} CHANGE weight submenutree_weight int(10) unsigned NOT NULL default '0'");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD siblingmenutree_enable int(10) unsigned NOT NULL default '0'");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD siblingmenutree_title varchar(255) NOT NULL default ''");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD siblingmenutree_display int(10) unsigned NOT NULL default '0'");
+      $ret[] = update_sql("ALTER TABLE {node_submenutree} ADD siblingmenutree_weight int(10) unsigned NOT NULL default '0'");
+
+      $ret[] = update_sql("UPDATE {node_submenutree} SET submenutree_enable = 1");
+    break;
+  }
+  return $ret;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function submenutree_uninstall() {
+  db_query('DROP TABLE {node_submenutree}');
+}
+

@@ -1,0 +1,232 @@
+Views Calendar 5.x
+==================
+
+Version 5.2 dev
+===============
+
+- #361925 Body was missing in iCal export, needs a node_load() in the theme to work.
+- #444526 Fix typo in variable name for calendar truncation.
+- #427996 Calendar more link logic was reversed.
+
+Version 5.2.6
+===============
+
+- #349265 Fix broken logic when display unlimited events option was used.
+- #344789 Block view was wrong when displayed on 'week' view of calendar.
+- #372771 Don't add empty day div to mini calendar.
+- #369573 Fix jCalendar popup when used without clean urls.
+- #310633 Rework 'all day' logic to correctly handle increments.
+- #342932 Fix broken ical export, only the day export was working correctly.
+- #336018 Add Dutch translation.
+- Fix the calendar date selector so it works correctly as a select list when the Date Popup module is turned off.
+- #336533 Make sure overridden calendar view info is not overridden by default info.
+- #327221 Don't add 'today' class in empty blocks.
+
+Version 5.2.5
+===============
+
+- #336024 Fix navigation for Date selector when other arguments are used.
+- #312362 Add location to ical import.
+- #310893 Permormance improvements for ical feed.
+- #312418 Fix all_day event marker in ical import.
+- #312407 Fix title of Week view.
+- #324480 Rename calendar blocks so they show up together in block list.
+- #304103 Get rid of stripe name to match the way it is now done in the D6 version.
+- Make sure the ical defaults to the right view, it was always showing the month view.
+- #328097 Fix broken ical export now that items are keyed by time.
+- Make sure paragraphs buried in calendar cells use padding, not margins, for separation so the background color doesn't come through.
+- #338237 Replace 'local_offset_field' with 'offset_field' in date handler.
+- Get rid of hard-coded 'UTC' for database values in favor of consistently using date_get_timezone_db().
+- Set calendar item font size at a higher level to make sure all sub-elements pick it up and make it easier to override in the theme.
+- #336567 Add extra test for valid values to date processing to avoid fatal error on empty property.
+- #337209 Add configuration option for new function to truncate long text in calendar cells.
+
+Version 5.2.4
+===============
+
+- Set day-splitting timezone to be sure it will split days using the time displayed in the calendar.
+- Adapt processing to make sure only selected dates display in nodes, views, and calendars.
+- Add option to maximum items per day to either show maximum plus 'more' link or hide all and link to day.
+- #324061, #324701 Revert the calendar_colorpicker.js back to the D5 version, it got switched to the D6 version accidentally.
+- Adjust the recent changes to the navigation header to be sure only the calendar header and not the date browser is affected.
+- #292164 Keep calendar date selector description from floating out of block in IE.
+- #298929 Fix code so that calendar legend doesn't display empty div when empty.
+- Make some fixes to the calendar legend to be sure text added for accessibility stays invisible in all themes.
+- Rework html of Year view so month titles will match block view month title for easier css themeing.
+- #323265 Add year as well as month to calendar titles.
+- #319344 Add 'empty' class and updated css styles provided by MothersClick.com.
+- #319344 Add method of truncating title and other fields in calendar cells.
+- #174580 Add min/max year setting to Date argument and set Page Not Found outside that range.
+- #174580 Add rel=nofollow to back/next links.
+- #319344 Add method of limiting the number of events that display in calendar cells.
+- #310262 Add missing parameter to calendar_build_nodes() in calendar ical.
+- #314682 Add missing url() in jcalendar js code.
+- #311839 Fix permissions to see header and empty text.
+- #313161 Use date_id as iCal UID to be sure it is unique.
+- #306328 Fix one more embedded link for the week number.
+- #303537 Display:relative should be position:relative.
+- #313538 Fix color typo in calendar.css.
+- #306328 Fix week links.
+
+Version 5.2.3
+===============
+
+- #306128 Make sure non-calendar views have the right base calendar links.
+- #292061 Validation for grouped handlers was showing non-cck handlers as invalid.
+- #305677 Preserve sort order in non-calendar views, including imported feeds.
+- #243172 Fix handling of navigation on non-calendar view with calendar arguments.
+- #296735 Make sure 'day' links use the leading zeros for consistency.
+- #196611 Add 'empty' text to header when there are no results.
+- #294469 Get rid of redundant timezone conversion that showed dates without timezone conversion in UTC.
+- #304948 Make sure new method of handling blocks and embeds creates right 'day' link.
+- #304948 Make sure new method of handling blocks and embeds with no default values will pass is_calendar testing in views_pre_view.
+- #304762 Add missing folders for translations.
+
+Version 5.2.2
+===============
+- Critical bugfix, fix possible undefined $item->$tz.
+
+Version 5.2.1
+===============
+
+- Use date functions to determine timezones, for consistency in timezone handling.
+- #295523 patch by JohnAlbin, alter code so all calendar navigation and paths will work correctly when the calendar is embedded. Should get calendars in panels working right.
+- #292061 Add validation to prevent using 'first' or 'last' as well as 'grouped' handlers in the calendar so dates display on the correct day.
+- #298680, #300361 get rid of concatonation of 'from' and 'to' dates to fix problems displaying them correctly.
+- Replace all include_once() with require_once().
+- #301324 Rework calendar date selector to use site short date format.
+- #294185 Add test for non-NULL values when concating the from/to date values, using COALESCE.
+- Fix css for week number to be sure it stays small in all browsers.
+- Add test for view->block_identifier to allow a way to set the block url to something other than 'mini=' so you can have more than one calendar block or panel on a page.
+
+Version 5.2.0-rc5
+=================
+
+- Fix jCalendar popup so it doesn't do anything on items without a nid, like remote nodes.
+- Make sure Devel module doesn't add queries to Calendar Popups.
+- #292306 Make sure no error is thrown if $GLOBALS['calendar_stripes'] is empty.
+- Make sure database values with empty timezone names get defaulted to use site timezone in calendar handling.
+- #288644 Add test for $args in calendar_real_url().
+- #292811 From/To arguments should be combined with AND instead of OR.
+- Rework the calendar legend to incorporate imported ical node colors as well as internal colors.
+- Add helper function calendar_get_node_link() to construct a node link for either an internal or external node.
+- #272330 Rework css to add background colors where colors are defined and group colors together in the file.
+
+Version 5.2.0-rc4
+=================
+
+- Add 'All day' themes for use in nodes and calendar psuedo nodes.
+- #290826 Fix logic error that was missing date ranges that start before the current period by changing 'AND' to 'OR' in argument filter.
+- #268669 Improve logic for splitting multi-day nodes across calendar dates, patch by emok.
+- Add new DATE_FORMAT_DATE for date-only format that is used throughout the calendar.
+
+Version 5.2.0-rc3
+=================
+
+- Make sure you can have arguments with summary views preceding the calendar.
+- #258176 Make sure mini calendar links includes all other arguments.
+- #239594 Make sure ical links with other arguments work correctly.
+- #238287 Make sure calendars with other args (like OG) display default view.
+- #269920 Fix breadcrumb on year view.
+- #238369 Clean up breadcrumb when using calendar with other arguments.
+- #282008 Fix back/next links on year view to omit mini links.
+- Tweaked the jcalendar popup html and css a bit to keep title from popping out of the box in some themes.
+- Bring the 5.2 and 6.2 calendar themes into alignment so both use the same styles and themes, including tableless back/next navigation links and themeable headers.
+- #283902 Make sure date_format() isn't used on items with no calendar dates.
+- #283206 Backport ability to use full name of week days in calendar view.
+- #284760 Don't make weekno a link when there is no week view, eliminate some redundant date_format() calls.
+- #276421 Use farbtastic color picker to set calendar stripes, and start process of making stripes more customizable.
+- #282777 Try to make calendar creation in PHP4 more efficient to speed up creation of year calendar.
+
+Version 5.2.0-rc2
+=================
+
+- #278391 Fix calendar popup position in Firefox.
+- #278267 Add a theme for the jcalendar popup.
+- #279169 Get rid of calendar_info() function in uninstall.
+- #261610 Make sure delta value is available for jcalendar popup display.
+- #255984 Make popup calendar date selector a configurable value.
+- #251094 Make weekno a configurable value.
+- #259127 Remove ajax back/next navigation on mini calendar, it's not working well enough.
+- #247215 Make sure default calendar view and block are not triggered if there is no date field and add validation to the view to require a date field.
+- #268668 Adjust comparison dates for timezone offsets to make sure multi-day events get split correctly.
+- The cached ical feed cannot be used to store date objects, recreate them as needed.
+- #234070 Fix broken ical title.
+- #258501 Make sure calendar.inc is included when creating ical feed.
+- #258515 Fix url in ical export.
+- #266623 Protect against foreach() errors on empty ical feeds.
+- PHP4 can't do comparisons of date objects, so alter calendar comparison code to compare formatted dates instead.
+- #275213 Arguments were reversed in date_week_range().
+- Remove as many dependencies as possible from install files and auto-enable necessary modules.
+- #272263 Make sure empty ical stream doesn't get into cache.
+- Cleanup calendar_info() values - we don't use granularity and only need one array for from/to.
+- #261610 Prepare for a jQuery popup in the calendar by adding a unique id to the 'node' and altering the date theme to surpress all other dates if $node->date_id is set.
+- #243172 Theme('calendar_empty') should be theme('calendar_empty_day'), patch by JohnAlbin.
+- Clean up install file included files and include file paths, and auto-enable date_timezone and date_php4.
+- Switch calendar_date_week() to date_week() and calendar_week_range() to date_week_range().
+- Make sure mini calendar works correctly for non-calendar views, like lists.
+- #154479 Add jQuery ajax update for navigating mini block calendar.
+- #223601 Re-implement the 'mini' url for calendar block so it will work in Panels and ajax.
+- #243220 Add items to the calendar date box theme.
+- #243725 Add title/description/url to calendar setup form.
+- #243254 Make sure args aren't overriden if already set.
+- #239501 Add missing argument for teaser display.
+- #210844 Make sure empty text displays.
+- #234635 Add calendar_build_nodes() to calendar_ical export processing.
+- #243712 make sure default views are retrieved as well as db views.
+- #235434 Using timezone name instead of timezone object in several places.
+- #233513 Fix missing $selected marker.
+- #233975 Don't bypass theme function.
+- #242686 Fix spelling errors.
+- #240297 make sure id has a value.
+
+Version 5.2.0-rc
+================
+- Make sure new required modules get enabled during the update.
+- Fix To time in calendar, was incorrectly picking up a :59 value.
+- Make sure min and max dates are in localtime.
+- #225459 Fix days that span multiple days.
+- #220657 Revert to using the API instead of templates for drawing the calendar.
+- #186875 make sure navigation is always returned as an array so it doesn't break table theme.
+- Remove database timezone handling by rolling back to previous version that used offsets instead. Based on problems noted in #218479 and #220663, we cannot count on database timezone handling to be available in MYSQL or work consistently with the timezone names that PHP uses in POSTGRES, so trying to do timezone conversions in the database is not going to work.
+- #219200 Make sure views is available during install.
+- #218704 Fix error in setting array variable.
+- Getting rid of offsets!! Alter query code to cast ISO and UNIX dates to native datetimes and do timezone conversion in the database. Much faster and more accurate.
+  The offset fields can now be dropped from the Date fields since we only need the timezone name to do the conversion.
+- Simplify the query a bit, but it's still very complex. We need a native datetime field so we can let the db do this the right way.
+- Make sure calendar works with an argument before the calendar.
+- The popup calendar datepicker needs a default value in the normal datetime format.
+- Add settings option to not display year, month, day, or week view and adjust links to hide any link to hidden displays.
+- Get rid of separate mini args and so mini and main calendar move together. This has been often requested and we already have too much complication in tracking various filter and non-calendar arguments in the view.
+- Make sure ical dates only get shown once in views with more than one date field.
+- Make sure 'today', 'future', and 'past' classes don't get applied to non-date cells.
+- #216365 make sure all needed files are included in the install files.
+- We can't trust the database date conversion unless we have the right offset stored in the database, so only the date-specific dates have the right values for this to work. All others must be retrieved as UTC values and converted in PHP.
+- Make sure functions are available during install.
+- #128602 add classes for 'past' and 'future' to date boxes, not using them by default, but available to css.
+- #211568 Add setup option to show first 1, 2, or 3 letters of day names in mini calendar.
+- Missing a closing div tag in the month view.
+- Get rid of deprecated function date_time().
+- Fix date format for day view.
+- Wrong field name used to select date format.
+- Set the 'today' class before incrementing the date.
+- More clean up of themes to be sure both remote and local items have a reasonable display and to provide a theme to consistantly display dates.
+- Fix title and url of mini calendar.
+- Get iCal import working again in new version.
+- Non-calendar views should now be working, so you can switch between calendar, table, list, teasers, and nodes for the display for each time period.
+- Make sure $node->url is set so the link to the node works.
+- Move more of the code to the .inc file.
+- Clean up the date selector and add a new function to detect the calendar week from a date.
+- Add a dependency on Date Timezone.
+- Fix a critical typo that keeps more than one value from showing up for a day.
+- Clean up theme code.
+- Make the new date selector dependent on the Date Popup module.
+- Rework the calendar to pull values from a template table so we can browse and navigate by calendar week. This simplifies the code and hopefully will speed up processing the calendar since the database is doing the work of constructing the calendar template instead of using PHP computations. This method is also a more accurate way of computing calendar weeks. Requires an update to populate a template table. This works because there are only 14 possible calendar templates no matter how many years you go back or forward.
+- Add in the jQuery popup selector as a method to jump to different dates.
+- Fix theme error in day view that repeated all previous items with each new item.
+- Make sure blank nodes have the right values to create blank calendar pages.
+- Standardize on use of date_format_date() to get translations done on the formatted values of date parts.
+- Clean up css for month date boxes so display in Firefox and IE looks the same.
+- Lost the node nid in some places which kept dates from showing up.
+- Have to keep views handlers in calendar.module not in calendar_api.inc so they can be discovered when needed.
+- Updating Calendar HEAD with new version of Calendar module that works with the new 5.2 Date API in Date HEAD. 

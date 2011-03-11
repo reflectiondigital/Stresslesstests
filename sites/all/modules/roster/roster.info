@@ -1,0 +1,5 @@
+; $Id$
+name = Roster
+description = Displays roster of classes
+dependencies = tapir
+version = "5.x"

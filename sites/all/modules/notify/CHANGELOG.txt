@@ -1,0 +1,6 @@
+$Id: CHANGELOG.txt,v 1.1.4.2 2007/12/16 12:00:24 augustin Exp $
+
+
+#145147 - July 2007.
+The settings page for the notify.module is now to be found in Administer > Site configuration > Notification settings.
+

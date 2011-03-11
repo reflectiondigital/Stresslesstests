@@ -1,0 +1,6 @@
+[09-Jul-2010 10:33:03] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28
+[01-Aug-2010 11:33:12] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28
+[02-Aug-2010 12:43:06] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28
+[10-Sep-2010 12:13:01] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28
+[10-Sep-2010 12:42:02] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28
+[22-Feb-2011 13:36:04] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/stressle/public_html/shopscript/process.php on line 28

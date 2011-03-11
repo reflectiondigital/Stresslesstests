@@ -1,0 +1,517 @@
+# $Id: fr.po,v 1.1.2.1 2008/09/29 15:15:10 slybud Exp $
+#
+# French translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  imce.module,v 1.8.2.30 2007/05/14 17:57:39 ufku
+#  imce.info,v 1.1.2.3 2006/12/21 09:58:55 ufku
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: French translation for imce drupal module\n"
+"POT-Creation-Date: 2008-09-29 16:09+0200\n"
+"PO-Revision-Date: 2008-09-29 17:12+0100\n"
+"Last-Translator: Sylvain Moreau <sylvain.moreau@ows.fr>\n"
+"Language-Team: Sylvain Moreau, OWS <sylvain.moreau@ows.fr>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: French\n"
+
+#: imce.module:46
+msgid "IMCE settings"
+msgstr "Paramètres IMCE"
+
+#: imce.module:47
+msgid "Control how your image/file browser works."
+msgstr "Contrôlez la manière donc fonctionne votre navigateur d'images/fichiers"
+
+#: imce.module:52
+msgid "Settings"
+msgstr "Paramètres"
+
+#: imce.module:56;628
+msgid "Sub-folder tool"
+msgstr "Outil de sous-dossier"
+
+#: imce.module:73
+msgid "Personal files"
+msgstr "Fichiers personnels"
+
+#: imce.module:102
+msgid "Anonymous"
+msgstr "Anonyme"
+
+#: imce.module:122;174
+msgid "filename"
+msgstr "nom du fichier"
+
+#: imce.module:122
+msgid "size"
+msgstr "taille"
+
+#: imce.module:122;175
+msgid "dimensions"
+msgstr "dimensions"
+
+#: imce.module:122
+msgid "date"
+msgstr "date"
+
+#: imce.module:122
+msgid "operations"
+msgstr "opérations"
+
+#: imce.module:132
+msgid "File was deleted due to quota exceed!"
+msgstr "Le fichier a été supprimé en raison d'un dépassement de quota !"
+
+#: imce.module:139
+msgid "delete"
+msgstr "supprimer"
+
+#: imce.module:143
+msgid "Directory is empty."
+msgstr "Le répertoire est vide"
+
+#: imce.module:154
+msgid "Up"
+msgstr "Haut"
+
+#: imce.module:154
+msgid "Go"
+msgstr "Allez"
+
+#: imce.module:163
+msgid "Upload File"
+msgstr "Téléverser un Fichier"
+
+#: imce.module:164
+msgid "Scale if necessary"
+msgstr "Redimensionner si nécessaire"
+
+#: imce.module:165
+msgid "Create thumbnail"
+msgstr "Créer une vignette"
+
+#: imce.module:167;536
+msgid "Dimensions for scaling"
+msgstr "Dimensions pour le redimensionnement"
+
+#: imce.module:167;167
+msgid "Quota"
+msgstr "Quota"
+
+#: imce.module:167
+msgid "Unlimited"
+msgstr "Illimité"
+
+#: imce.module:167
+msgid "Limits"
+msgstr "Limites"
+
+#: imce.module:167;601
+msgid "File size"
+msgstr "Taille du fichier"
+
+#: imce.module:167
+msgid "Dimensions"
+msgstr "Dimensions"
+
+#: imce.module:172
+msgid "Resize image"
+msgstr "Redimensionner l'image"
+
+#: imce.module:176
+msgid "Create a copy"
+msgstr "Créer une copie"
+
+#: imce.module:184
+msgid "Image/File Browser"
+msgstr "Navigateur d'Images/Fichiers"
+
+#: imce.module:189
+msgid "Are you sure want to delete this file?"
+msgstr "Etes-vous sûr(e) de vouloir supprimer ce fichier ?"
+
+#: imce.module:190
+msgid "view"
+msgstr "voir"
+
+#: imce.module:191
+msgid "add"
+msgstr "ajouter"
+
+#: imce.module:192
+msgid "Display"
+msgstr "Afficher"
+
+#: imce.module:192
+msgid "all"
+msgstr "tous"
+
+#: imce.module:192
+msgid "images"
+msgstr "images"
+
+#: imce.module:192
+msgid "non-images"
+msgstr "non-images"
+
+#: imce.module:203
+msgid "Keyboard shortcuts"
+msgstr "Raccourcis clavier"
+
+#: imce.module:203
+msgid "UP(previous), DOWN(next), DELETE, INSERT(add)"
+msgstr "HAUT (précédent), BAS (suivant), SUPPRIMER, INSERER (ajouter)"
+
+#: imce.module:208
+msgid "Directory"
+msgstr "Répertoire"
+
+#: imce.module:210
+msgid "User"
+msgstr "Utilisateur"
+
+#: imce.module:210
+msgid "logout"
+msgstr "se déconnecter"
+
+#: imce.module:231
+msgid "No files were uploaded."
+msgstr "Aucun fichier n'a été téléversé."
+
+#: imce.module:238
+msgid "File upload error. Could not move uploaded file."
+msgstr "Erreur dans le transfert de fichiers. Impossible de déplacer le fichier transféré."
+
+#: imce.module:247
+msgid "Invalid filename."
+msgstr "Nom de fichier non valide."
+
+#: imce.module:255;283
+msgid "Only images with .jpg, .gif, and .png extensions are allowed."
+msgstr "Seules les images avec les extensions .jpg, .gif, et .png sont autorisées."
+
+#: imce.module:261
+msgid "Error scaling image."
+msgstr "Erreur dans le redimensionnement de l'image"
+
+#: imce.module:267
+msgid "Image was scaled to allowed dimensions."
+msgstr "L'image a été redimensionnée aux dimensions autorisées."
+
+#: imce.module:270;363
+msgid "Image dimensions exceed the limit."
+msgstr "Les dimensions de l'image dépassent la limite."
+
+#: imce.module:278
+msgid "Invalid file extension. Allowed extensions are .jpg, .gif, .png, !ext"
+msgstr "Extension de fichier non valide. Les extensions autorisées sont  .jpg, .gif, .png, !ext"
+
+#: imce.module:289
+msgid "File size exceeds upload limit."
+msgstr "La taille du fichier dépasse les limites de téléversement (upload)."
+
+#: imce.module:294;377
+msgid "You dont have enough free space."
+msgstr "Vous ne possédez pas assez d'espace libre."
+
+#: imce.module:302;384
+msgid "Error copying the file."
+msgstr "Erreur dans la copie du fichier."
+
+#: imce.module:310
+msgid "Upload successful."
+msgstr "Téléversement réalisé avec succès."
+
+#: imce.module:324
+msgid "Thumbnail created."
+msgstr "Vignette créée."
+
+#: imce.module:327
+msgid "Thumbnail can not be created."
+msgstr "Les vignette n'ont pu être supprimées."
+
+#: imce.module:338
+msgid "File deleted successfully."
+msgstr "Fichier supprimé avec succès."
+
+#: imce.module:341
+msgid "Error deleting file."
+msgstr "Erreur dans la suppression du fichier."
+
+#: imce.module:352
+msgid "File does not exist."
+msgstr "Le fichier n'existe pas."
+
+#: imce.module:359
+msgid "File type is not supported."
+msgstr "Le type de fichier n'est pas supporté."
+
+#: imce.module:370
+msgid "Error resizing image."
+msgstr "Erreur dans le redimensionnement de l'image."
+
+#: imce.module:392
+msgid "Resizing successful."
+msgstr "Redimensionnement réalisé avec succès."
+
+#: imce.module:401
+msgid "Error opening directory"
+msgstr "Erreur à l'ouverture du répertoire"
+
+#: imce.module:444
+msgid "Directory error!"
+msgstr "Erreur de répertoire !"
+
+#: imce.module:536;540;571;587
+msgid "Width"
+msgstr "Largeur"
+
+#: imce.module:536;540;571;587
+msgid "Height"
+msgstr "hauteur"
+
+#: imce.module:538
+msgid "These dimensions will be used while scaling down newly uploaded big images."
+msgstr "Ces dimensions seront utilisées pour le redimensionnement à la baisse des images nouvellement téléversées."
+
+#: imce.module:540;587
+msgid "Thumbnail dimensions"
+msgstr "Dimensions de la vignette"
+
+#: imce.module:542;593
+msgid "You can enable automatic thumbnail creation from newly uploaded images. To disable leave the fields blank."
+msgstr "Vous pouvez activer la création automatique de vignette à partir d'une image nouvellement téléversée. Pour le désactiver, laissez les champs vides."
+
+#: imce.module:544
+msgid "Your upload directory"
+msgstr "Votre répertoire de téléversement"
+
+#: imce.module:544
+msgid "This directory must be relative to <strong>!filepath</strong> directory. So if you want to use <strong>!filepath/foldername</strong>, just enter <strong>foldername</strong> here. You may also enter <strong>/</strong> to use the file system root. If you leave it blank, u1 will be used."
+msgstr "Ce répertoire doit être relatif au répertoire <strong>!filepath</strong>. Aussi, si vous souhaitez utiliser  <strong>!filepath/nomdurepertoire</strong>, saisissez simplement  <strong>nomdurepertoire</strong> ici. Vous pouvez aussi saisir <strong>/</strong> pour utiliser la racine du système de fichier. Si vous le laissez vide, u1 sera utilisé."
+
+#: imce.module:546;636
+msgid "Enable extras"
+msgstr "Activer les extras"
+
+#: imce.module:546;638
+msgid "This javascript package includes browsing enhancements like file sorting, keyboard shortcuts, file filtering, etc."
+msgstr "Ce package javascript contient des améliorations de navigation tels que le classement de fichiers, les raccourcis clavier, le filtrage de fichiers, etc..."
+
+#: imce.module:553
+msgid "delete files"
+msgstr "supprimer les fichiers"
+
+#: imce.module:555
+msgid "Permissions"
+msgstr "Permissions"
+
+#: imce.module:559
+msgid "upload files"
+msgstr "envoyer des fichiers"
+
+#: imce.module:564
+msgid "limitless upload"
+msgstr "téléversement sans limite"
+
+#: imce.module:566
+msgid "Enable/disable access for file upload and deletion in user directories. Limitless upload disables controlling filesize, image dimensions and quota."
+msgstr "Activer/Désactiver l'accès au téléversement et à la suppression de fichier dans les répertoires utilisateurs. Le téléversement sans limite désactive le contrôle de la taille de fichier, des dimensions de l'image et du quota."
+
+#: imce.module:571
+msgid "Image dimensions"
+msgstr "Dimensions de l'image"
+
+#: imce.module:577
+msgid "Define the maximum dimensions for an image to be uploaded."
+msgstr "Définit les dimensions maximales pour une image téléversée."
+
+#: imce.module:580
+msgid "Enable scaling of newly uploaded images."
+msgstr "Autoriser le redimensionnement des images nouvellement téléversées."
+
+#: imce.module:582
+msgid "If a newly uploaded image has dimensions exceeding the limit, it will be scaled down instead of giving an error."
+msgstr "Si une image nouvellement téléversée posséde des dimensions dépassant la limite, elle sera redimensionnée plutôt que de générer une erreur."
+
+#: imce.module:596
+msgid "Enable custom resizing."
+msgstr "Autoriser le redimensionnement personnalisé."
+
+#: imce.module:598
+msgid "Users will be able to resize their images to any size up to allowed dimensions."
+msgstr "Les utilisateurs pourront redimensionner leurs images en n'importe quelle taille, dans la limite des dimensions autorisées."
+
+#: imce.module:603
+msgid "Define the maximum file size(KB) for an image to be uploaded."
+msgstr "Définit la taille maximale de fichier (KB) pour une image téléversée."
+
+#: imce.module:606
+msgid "Upload quota"
+msgstr "Quota de téléversement"
+
+#: imce.module:608
+msgid "Define the total upload quota(KB) per user."
+msgstr "Définit le quota total de téléversement (KB) par utilisateur."
+
+#: imce.module:611
+msgid "Prefix for personal folder names"
+msgstr "Préfixe pour les noms de dossier personnel"
+
+#: imce.module:613
+msgid "Define the prefix that user IDs will be appended in order to create personal folders. Ex: entering \"u\" will result in folder names like u1, u14 etc. If you leave it blank, user IDs will be used as folder names."
+msgstr "Définit le préfixe qui sera apposé aux IDs utilisateurs afin de créer les dossiers personnels. Ex : la saisie de \"u\" aura pour résultats des noms de dossiers tels que u1, u14 etc... Si vous le laissez vide, les IDs utilisateurs seront utilisés en tant que nom de dossier."
+
+#: imce.module:616
+msgid "Use a shared folder"
+msgstr "Utiliser un dossier partagé"
+
+#: imce.module:618
+msgid "If you want all your users to <strong>use a common folder instead of personal folders</strong>, here you can define that folder name (ex. images). Notice that shared upload means shared quota. If you are happy with personal folders leave this field blank."
+msgstr "Si vous vous souhaitez que tous vos utilisateurs <strong>utilisent un dossier commun au lieu de dossiers personnels</strong>, vous pouvez définir ici ce nom de dossier (ex. images). Veuillez noter que téléversement partagé signifie quota partagé. Si vous êtes content des dossiers personnels, laissez ce champ vide."
+
+#: imce.module:621
+msgid "Enable sub-folder navigation."
+msgstr "Activer la navigation dans les sous-dossiers."
+
+#: imce.module:623
+msgid "This option allows users to manage multiple folders under their main folder. Only the users who have at least one sub-folder can use this feature."
+msgstr "Cette option permet aux utilisateurs de gérer des dossiers multiples sous leur dossier principal. Seuls les utilisateurs possédant au moins un sous-dossier peuvent utiliser cette fonctionnalité."
+
+#: imce.module:626
+msgid "Default sub-folder names"
+msgstr "Nom par défaut des sous-dossiers"
+
+#: imce.module:628
+msgid "Enter comma separated sub-folder names that will be created automatically, if the sub-folder navigation is enabled. Each user of this role will have these folders in their main folder by default. Additional folders can be created using !subfoldertool. You should note that total user quota increases with every new sub-folder because the quotation is per folder basis."
+msgstr "Saisissez des noms de sous-dossiers séparés par des virgules, qui seront automatiquement créés, si la navigation dans les sous-dossier est activée. Chaque utilisateur de ce rôle aura ces dossiers dans son dossier principal par défaut. Des dossiers supplémentaires peuvent être créés en utilisant !subfoldertool. Notez que le quota utilisateur total augmente avec chaque nouveau sous-dossier, car le système de quota est une base par dossier."
+
+#: imce.module:631
+msgid "Non-image file support"
+msgstr "Support des fichiers non-image"
+
+#: imce.module:633
+msgid "Although IMCE is mainly designed to browse images, it supports uploading and browsing of any file type. If you like to use this feature, define your <strong>allowed non-image file extensions</strong> here with a comma between them. Ex .doc, .pdf, .zip.  Note that, image upload limits also apply for these files. For a pure image browser leave this field blank."
+msgstr "Bien que IMCE soit principalement conçu pour la navigation, il supporte la navigation et le téléversement de fichiers de n'importe quel type. Si vous souhaitez utiliser cette fonctionnalité, définissez vos <strong>extensions de fichiers non-image autorisées</strong> ici, avec une virgule entre chacun d'elles. .doc, .pdf, .zip. Veuillez noter que les limites de téléversement s'appliquent aussi à ces fichiers. Pour un pur navigateur d'images, laissez ce champ vide."
+
+#: imce.module:650
+msgid "Common settings"
+msgstr "Paramètres communs"
+
+#: imce.module:652
+msgid "Enable tinyMCE support"
+msgstr "Activer le support tinyMCE"
+
+#: imce.module:654
+msgid "Make IMCE the default image/file browser for tinyMCE."
+msgstr "Faire de IMCE le navigateur d'images/fichiers par défaut pour tinyMCE."
+
+#: imce.module:657
+msgid "Enable FCKEditor support"
+msgstr "Activer le support  FCKEditor"
+
+#: imce.module:659
+msgid "Replace the built-in file browser of FCKeditor with IMCE."
+msgstr "Remplacer le navigateur de fichiers inclus dans FCKEditor par IMCE."
+
+#: imce.module:662
+msgid "Enable inline image/file insertion into plain textareas"
+msgstr "Activer l'insertion en ligne d'images/fichiers dans les les textareas simples "
+
+#: imce.module:665
+msgid "This feature allows you to add your images or files as <strong>html code into any plain textarea</strong>. This is useful especially when you dont use a wysiwyg editor such as tinyMCE or FCKeditor. Enter <strong>comma separated textarea IDs</strong> if you want to enable this feature. Otherwise, leave it blank. Hint: ID of Body fields in most node types is edit-body."
+msgstr "Cette fonctionnalité vous permet d'ajouter des images ou des fichiers en tant que <strong>code html dans des champs textareas simples</strong>. Ceci est utile en particulier lorsque vous n'utilisez pas d'éditeur wysiwyg tel qie tinyMCE ou FCKeditor. Saisissez <strong>une liste spéarée par des virgules d'IDs de champs textarea</strong> si vous souhaitez activer cette fonctionnalité. Sinon, laissez-le vide. Tuyau : l'ID des champs Corps dans la plupart des types de noeuds est edit-body."
+
+#: imce.module:674
+msgid "Role precedence"
+msgstr "Hiérarchie des rôles "
+
+#: imce.module:676
+msgid "A user having <strong>multiple roles</strong> gets the permissions of the highest one. Sort role IDs according to their <strong>precedence from higher to lower</strong> by putting > in between. Here is the id-name pairs of roles having access to IMCE:"
+msgstr "Un utilisateur possédant des <strong>rôles multiples</strong> aura les permissions du plus élevé. Classez les IDs de rôles selon leur <strong>hiérarchie du plus élevé au plus bas</strong> en les séparant par >. Vous trouverez ici les paires id-nom des rôles qui ont accès à IMCE : "
+
+#: imce.module:681
+msgid "Settings for user #1"
+msgstr "paramètres pour l'utilisateur #1"
+
+#: imce.module:685
+msgid "Settings for the role: !role"
+msgstr "Paramètres pour le rôle : !role"
+
+#: imce.module:688
+msgid "Save"
+msgstr "Enregistrer"
+
+#: imce.module:721
+msgid "The changes have been saved."
+msgstr "Les changements ont été enregistrés."
+
+#: imce.module:769
+msgid "Insert !image or !link."
+msgstr "Insérer !image ou !lien"
+
+#: imce.module:769
+msgid "image"
+msgstr "image"
+
+#: imce.module:769
+msgid "link"
+msgstr "lien"
+
+#: imce.module:782
+msgid "Browse this user's files using !yours or !his"
+msgstr "Parcourir les fichiers de cet utilisateur en utilisant !yours ou !his"
+
+#: imce.module:782
+msgid "your privileges"
+msgstr "vos privilèges"
+
+#: imce.module:782
+msgid "his/her privileges"
+msgstr "ses privilèges"
+
+#: imce.module:812
+msgid "<p>Here you can create sub-folders for your users. Multiple folder creation is possible at a time with the <strong>*</strong> character. For example, specifying <strong>user*/foo</strong> will create <strong>foo</strong> named folders under each folder starting with <strong>user</strong>. */foo*/bar will create bar named folders under folders starting with foo in each folder of file system path.</p>"
+msgstr "<p> Vous pouvez créer ici des sous-dossiers pour vos utilisateurs. La création de dossiers multiples en une fois est possible à l'aide du caractère <strong>*</strong>. Par exemple,  spécifier <strong>user*/foo</strong> aura pour effet la création de dossiers nommés <strong>foo</strong> en desous de chaque dossier commençant par <strong>user</strong>. */foo*/bar crééra des dossiers nommés bar sous les dossiers commençant par foo, dans chaque répertoire du système de fichiers."
+
+#: imce.module:813
+msgid "Folder path"
+msgstr "Chemin du dossier"
+
+#: imce.module:814
+msgid "Create"
+msgstr "Créer"
+
+#: imce.module:844
+msgid "Specified path must be under file sytem path."
+msgstr "Le chemin spécifié doit se trouver sous le chemin du système de fichiers."
+
+#: imce.module:856
+msgid "No matching sub-folders found."
+msgstr "Aucun sous-dossier correspondant trouvé."
+
+#: imce.module:28
+msgid "access imce"
+msgstr "accéder à imce"
+
+#: imce.module:28
+msgid "administer imce"
+msgstr "administrer imce"
+
+#: imce.module:0
+msgid "imce"
+msgstr "imce"
+
+#: imce.info:0
+msgid "IMCE"
+msgstr "IMCE"
+
+#: imce.info:0
+msgid "An image/file uploader and browser supporting personal directories and user quota."
+msgstr "Un téléverseur et un navigateur d'images/fichiers, qui supporte les répertoires personnels et les quotas utilisateurs."
+

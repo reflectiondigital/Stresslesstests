@@ -1,0 +1,175 @@
+<?php
+
+
+/**
+* Implementation of hook_help().
+*
+* Throughout Drupal, hook_help() is used to display help text at the top of
+* pages. Some other parts of Drupal pages get explanatory text from these hooks
+* as well. We use it here to provide a description of the module on the
+* module administration page.
+*/
+function contactform_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      // This description is shown in the listing at admin/modules.
+      return t('The contactform module allows admins to email customers.');
+  }
+}
+
+/**
+* Implementation of hook_perm().
+*
+*/
+function contactform_perm() {
+  return array('access contactform');
+}
+
+
+/**
+* Implementation of hook_menu().
+*
+*/
+function contactform_menu($may_cache) {
+  $items = array();
+
+    $access = user_access('access contactform');
+    
+    $items[] = array(
+      'path' => 'contactform',
+      'title' => t('Customer Contact Form'),
+      'callback' => 'contactform_sampleform',
+      'access' => user_access('access contactform')
+    );
+       
+    return $items;
+}
+
+
+
+
+function contactform_sampleform() {
+    $form = array();
+
+    // Build up the form
+    // See api.drupal.org/api/4.7/file/developer/topics/forms_api.html (quickstart guide)
+    // and api.drupal.org/api/4.7/file/developer/topics/forms_api_reference.html (forms api)
+    // for more information on creating forms
+
+$form['EMAIL'] = array(
+    '#type' => 'textfield',
+    '#title' => t('To (Email)'),
+    '#size' => 30,
+    '#maxlength' => 128,
+    '#required' => TRUE,
+    '#description' => 'Separate multiple addresses with commas.',
+);
+   
+      
+	$form['subject'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Subject'),
+		'#size' => 30,
+		'#maxlength' => 128,
+		'#required' => TRUE,
+	);
+	    
+     $form['MESSAGE'] = array(
+      '#type' => 'textarea',
+      '#rows' => 3,
+      '#title' => t('Message')
+    );
+    
+ 
+	 $form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Send'),
+	);
+	//$form['#attributes']['enctype'] = 'multipart/form-data';
+	
+	$output = drupal_get_form('contactform', $form);
+	return $output;
+
+}
+
+
+// validation function for the contact form
+function contactform_validate($form_id, $form_values) {
+    global $user;
+    // first we validate if there is a email injection
+    $finds = array("/bcc:/i",
+            "/Content-Type:/i",
+            "/Mime-Type:/i",
+            "/MIME-Version:/i",
+            "/multipart\/mixed/i",
+            "/boundary=/i",
+            "/subject:/i",
+            "/cc:/i",
+            "/to:/i");
+    foreach($form_values as $value)
+          foreach($finds as $find)
+                if(preg_match($find,$value))
+                    form_set_error('', '<h2 class="red center">Stop spamming</h2>');
+
+    // then we validate the email-adress  
+    $recipients = explode(',', $form_values['EMAIL']);
+    foreach($recipients as $recipient) {
+      if (!valid_email_address(trim($recipient))) {
+        form_set_error('recipients', t('%recipient is an invalid e-mail address.', array('%recipient' => theme('placeholder', $recipient))));
+        }
+      }
+    
+}
+
+// submit function for the contact form
+function contactform_submit($form_id, $form_values) {
+     
+     $form_values[$field->title] = $value;
+
+     $body.= "-----\n";
+    $body.= t("Submitted on %date\n", array('%date' => format_date(time()))
+    );
+       
+    $recipient       = $form_values['EMAIL'];
+    ///////////// enter address here ///////////////////////////////////////////
+    $from   = 'Digital Media Center <digitalmedia@jhu.edu>';
+     ///////////// enter address here //////////////////////////////////////////
+    $subject    = $form_values['subject'];
+    $body        = wordwrap($form_values['MESSAGE']);
+    //$reply        = 'Your message has been submitted';
+    $goto        = '<front>';
+
+    if (!flood_is_allowed('contact', variable_get('contact_hourly_threshold', 3))) {
+        $output = t("You cannot send more than %number messages per hour. Please try again later.", array('%number' => variable_get('contact_hourly_threshold', 3)));
+        drupal_set_message('<h3 class="red center">'.$output.'</h3>');
+        drupal_goto($goto);
+    }else{   
+        $attachment    = FALSE;
+        $trenner    = md5(uniqid(time()));
+        $headers    .= "MIME-Version: 1.0\n";
+        $headers    .= "From: $from\nReply-to: $from\nReturn-path: $from\nErrors-to: $from\nX-Mailer: Drupal\n";           
+        $headers    .= "Content-Type: multipart/mixed;\n\tboundary=$trenner\n";
+        $message    .= "\n--$trenner\n";
+        $message    .= "Content-Type: text/plain; charset=UTF-8;"."\n\n"; // sets the mime type
+        $message    .= $body."\n";
+        $message    .= "\n\n";
+        
+        
+        
+        $message .= "--$trenner--";
+
+        // send Mail
+         user_mail($recipient, $subject, $body, "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from");
+
+         
+        // Log the operation:
+        flood_register_event('contactform');
+         watchdog('mail', t('admin contact form to %name-via', array('%name-via' => theme('placeholder', "<$recipient>"),)));
+         
+        // Update user:
+  drupal_set_message(t('Your message has been sent.'));
+        drupal_goto($goto);
+        }
+
+    }
+?>

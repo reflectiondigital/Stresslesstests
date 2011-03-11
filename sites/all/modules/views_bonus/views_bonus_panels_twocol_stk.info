@@ -1,0 +1,10 @@
+name = Bonus: panels, teasers, 1 top + 2 columns
+description = "Show views as teasers with the first entry spanning 2 columns on the top, then additional entries alternating left and right beneath."
+dependencies = views panels
+package = Views
+
+; Information added by drupal.org packaging script on 2007-08-02
+version = "5.x-1.1"
+project = "views_bonus"
+datestamp = "1186077525"
+

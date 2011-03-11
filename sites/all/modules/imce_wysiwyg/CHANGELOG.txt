@@ -1,0 +1,24 @@
+// $Id: CHANGELOG.txt,v 1.2.2.3 2009/06/22 16:00:48 sun Exp $
+
+IMCE Wysiwyg x.x-x.x, xxxx-xx-xx
+--------------------------------
+
+
+IMCE Wysiwyg 5.x-1.x, xxxx-xx-xx
+--------------------------------
+
+
+IMCE Wysiwyg 5.x-1.0, 2009-06-22
+--------------------------------
+#385962 by kingandy, lemunet, sethcohn: Fixed integration for IMCE in D5.
+#385962 by pletcher, sun: Ported imce_wysiwyg back to Drupal 5.
+
+
+IMCE Wysiwyg 6.x-1.0, 2009-03-04
+--------------------------------
+#380944 by sun: Fixed url encoding for FCKeditor and proper invocation of
+  imce_access().
+#380944 by sun: Added documentation; code clean-up.
+#287025 by sun: Added Wysiwyg API integration code for IMCE.
+
+

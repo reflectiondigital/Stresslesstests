@@ -1,0 +1,34 @@
+<?php
+// $Id: views_bonus_panels_threecol.module,v 1.2.2.2 2007/02/03 18:26:13 merlinofchaos Exp $
+
+function views_bonus_panels_threecol_views_style_plugins() {
+  $items['panels_threecol'] = array(
+    'name' => t('Panels: Teasers, 3 columns'),
+    'theme' => 'views_bonus_panels_threecol',
+    'summary_theme' => 'views_summary',
+  );
+  return $items;
+}
+
+function theme_views_bonus_panels_threecol($view, $nodes, $type) {
+  $teasers = true;
+  $links = true;
+
+  $content = array();
+  foreach ($nodes as $count => $n) {
+    $node = node_load($n->nid);
+    switch ($count % 3) {
+      case 0:
+        $section = 'left';
+        break;
+      case 1:
+        $section = 'middle';
+        break;
+      case 2:
+        $section = 'right';
+        break;
+    }
+    $content[$section] .= node_view($node, $teasers, false, $links);
+  }
+  return panels_print_layout('threecol_33_34_33', $content);
+}

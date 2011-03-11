@@ -1,0 +1,11 @@
+; $Id: jcalendar.info,v 1.1.2.1 2008/06/23 14:53:59 karens Exp $
+name = Calendar Popup
+description = "Replaces the links to calendar items with a javascript popup that gracefully regresses if javascript is not enabled"
+dependencies = calendar views
+package = Date/Time
+
+; Information added by drupal.org packaging script on 2009-05-06
+version = "5.x-2.7"
+project = "calendar"
+datestamp = "1241611516"
+

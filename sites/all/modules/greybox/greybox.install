@@ -1,0 +1,14 @@
+<?php
+// $Id: greybox.install,v 1.1.2.2 2008/12/04 07:00:08 Gurpartap Exp $
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function greybox_uninstall() {
+  variable_del('greybox_enable');
+  variable_del('greybox_animate');
+  variable_del('greybox_class_text');
+  variable_del('greybox_window_width');
+  variable_del('greybox_window_height');
+}
+
